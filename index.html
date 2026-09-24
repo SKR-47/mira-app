@@ -36,7 +36,6 @@ button{font-family:inherit}
 .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .wrap{max-width:1040px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
 
-/* ---------- cabecera ---------- */
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:rgb(0 0 0 / .92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line-soft)}
 .top .bar{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;min-height:60px;padding:10px 0}
 .brandrow{display:flex;align-items:center;gap:16px}
@@ -57,7 +56,6 @@ button{font-family:inherit}
 
 .view{padding:clamp(22px,4vw,40px) 0 56px}
 
-/* ---------- controles ---------- */
 .settings{display:flex;flex-wrap:wrap;gap:12px 30px;margin-bottom:16px;transition:opacity .2s}
 .settings[inert]{opacity:.3}
 .group{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
@@ -77,7 +75,7 @@ button{font-family:inherit}
 .ranked-note{margin:0 0 20px;color:var(--muted);font-size:.88rem}
 .ranked-note b{color:var(--pink);font-weight:600}
 
-/* ---------- entrenar ---------- */
+
 .hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:16px;margin-bottom:16px}
 .hud>div{display:flex;flex-direction:column}
 .num{font:600 clamp(1.7rem,5.4vw,2.9rem)/1.1 var(--display);color:var(--pink);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
@@ -110,7 +108,6 @@ button{font-family:inherit}
 .res-note{margin:18px 0 0;color:var(--muted);font-size:.85rem}
 .today{margin:18px 0 0;color:var(--muted)}
 
-/* ---------- calendario ---------- */
 .cal-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(28px,5vw,60px);align-items:start}
 .cal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
 .cal-title{margin:0;font:500 clamp(1.3rem,3.6vw,1.9rem)/1.1 var(--display);letter-spacing:-.02em;text-transform:capitalize}
@@ -147,7 +144,7 @@ button{font-family:inherit}
 .sess .tag.loss{color:var(--muted)}
 .detail .btn{margin-top:18px}
 
-/* ---------- gráficas ---------- */
+
 .chart-controls{display:flex;flex-wrap:wrap;gap:14px 34px;margin-bottom:28px}
 .chart-summary{margin-bottom:22px}
 .big{font:600 clamp(2.5rem,8vw,4.2rem)/1 var(--display);color:var(--pink);letter-spacing:-.04em;text-shadow:0 0 30px rgb(var(--pink-rgb) / .5)}
@@ -170,7 +167,6 @@ button{font-family:inherit}
 .chart-empty{border:1px dashed var(--line);border-radius:8px;padding:48px 24px;text-align:center;color:var(--muted)}
 .chart-empty .btn{margin-top:16px}
 
-/* ---------- pie ---------- */
 .foot{border-top:1px solid var(--line-soft);padding:20px 0 32px;color:var(--muted);font-size:.85rem}
 .foot .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px}
 .foot p{margin:0}
@@ -222,7 +218,7 @@ button{font-family:inherit}
 
 <main class="wrap">
 
-  <!-- ENTRENAR -->
+
   <section class="view" id="view-train" role="tabpanel" aria-labelledby="tab-train">
     <div class="settings" id="settings">
       <div class="group" role="group" aria-labelledby="l-mode">
@@ -265,7 +261,6 @@ button{font-family:inherit}
     <p class="today" id="today"></p>
   </section>
 
-  <!-- CALENDARIO -->
   <section class="view" id="view-cal" role="tabpanel" aria-labelledby="tab-cal" hidden>
     <div class="cal-layout">
       <div>
@@ -293,7 +288,7 @@ button{font-family:inherit}
     </div>
   </section>
 
-  <!-- GRÁFICAS -->
+
   <section class="view" id="view-charts" role="tabpanel" aria-labelledby="tab-charts" hidden>
     <div class="chart-controls">
       <div class="group" role="group" aria-labelledby="l-metric">
@@ -351,9 +346,6 @@ button{font-family:inherit}
 const $  = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
-/* =========================================================
-   Almacenamiento (localStorage con respaldo en memoria)
-   ========================================================= */
 const KEY_S = 'mira.sessions.v1';
 const KEY_C = 'mira.config.v1';
 const KEY_P = 'mira.profile.v1';
@@ -370,9 +362,6 @@ function save(key, val){
   try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
 }
 
-/* =========================================================
-   Estado
-   ========================================================= */
 let sessions = load(KEY_S, []);
 if (!Array.isArray(sessions)) sessions = [];
 sessions = sessions.filter(s => s && typeof s.t === 'number' && typeof s.d === 'string');
@@ -402,9 +391,6 @@ let calMonth = new Date(); calMonth = new Date(calMonth.getFullYear(), calMonth.
 const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 const COARSE = window.matchMedia && matchMedia('(pointer: coarse)').matches;
 
-/* =========================================================
-   Utilidades
-   ========================================================= */
 const PINK = '#ff2ea6';
 const MODES = { classic: 'Clásico', burst: 'Ráfaga', ranked: 'Ranked' };
 const SIZE_NAMES = { s: 'pequeño', m: 'medio', l: 'grande' };
@@ -459,9 +445,6 @@ function calcScore(hits, rt, miss, size, dur){
   return Math.max(0, Math.round(raw * 60 / dur));
 }
 
-/* =========================================================
-   Niveles y XP
-   ========================================================= */
 function xpForLevel(lvl){ return Math.round(70 * Math.pow(lvl, 1.42) + 30 * lvl); }
 function levelFromXp(xp){
   let lvl = 1, need = xpForLevel(1), rem = Math.max(0, xp);
@@ -476,9 +459,7 @@ function xpGain(s){
   return Math.max(6, base);
 }
 
-/* =========================================================
-   Ranked: rangos y bots
-   ========================================================= */
+
 const TIERS = [
   { min: 0,    name: 'Bronce' },
   { min: 1000, name: 'Plata' },
@@ -508,10 +489,7 @@ function eloUpdate(rating, oppRating, result){
   return Math.max(0, Math.round(rating + K * (r - expected)));
 }
 
-/* El perfil (nivel, XP, rango) se recalcula siempre a partir del historial
-   de sesiones en lugar de guardarse "a mano". Así, cargar datos de ejemplo,
-   importar un archivo o borrar el historial dejan el perfil consistente
-   automáticamente, sin lógica duplicada. */
+
 function syncProfileFromSessions(){
   const sorted = sessions.slice().sort((a, b) => a.t - b.t);
   let xp = 0, wins = 0, losses = 0, draws = 0, rating = 1000;
@@ -540,9 +518,7 @@ function renderProfile(){
   $('#p-xpbar').style.width = Math.round(into / need * 100) + '%';
 }
 
-/* =========================================================
-   Juego
-   ========================================================= */
+
 const canvas = $('#arena');
 const ctx = canvas.getContext('2d');
 const ovIdle = $('#ov-idle');
@@ -872,9 +848,6 @@ function renderToday(){
   $('#today').textContent = txt;
 }
 
-/* =========================================================
-   Calendario
-   ========================================================= */
 let selDay = dayKey(new Date());
 
 function renderCalendar(){
@@ -959,9 +932,7 @@ $('#cal-today').addEventListener('click', () => {
   renderCalendar(); renderDetail();
 });
 
-/* =========================================================
-   Gráficas diarias
-   ========================================================= */
+
 const METRICS = {
   score: {
     label: 'Puntos', get: a => a.score, sess: s => s.score, zero: true, better: 'up',
@@ -1129,7 +1100,7 @@ function renderCharts(){
     firstLabel = false;
   });
 
-  // sesiones sueltas
+ 
   if (M.sess){
     days.forEach((dd, i) => dd.list.forEach(se => {
       const v = M.sess(se);
@@ -1137,7 +1108,7 @@ function renderCharts(){
     }));
   }
 
-  // tramos continuos (para rating, mantiene el último valor conocido entre partidas)
+
   let plotDays = days;
   if (isRating){
     plotDays = [];
@@ -1236,9 +1207,7 @@ new ResizeObserver(() => {
   if (view === 'charts' && w && Math.abs(w - lastChartW) > 1){ lastChartW = w; renderCharts(); }
 }).observe($('#chart-svg'));
 
-/* =========================================================
-   Chips de configuración
-   ========================================================= */
+
 function syncChips(){
   $$('.chip[data-k]').forEach(c => {
     const k = c.dataset.k;
@@ -1266,9 +1235,7 @@ document.addEventListener('click', e => {
   syncChips();
 });
 
-/* =========================================================
-   Navegación
-   ========================================================= */
+
 function setView(v){
   if (v !== 'train') cancelGame();
   view = v;
@@ -1297,9 +1264,7 @@ $('.tabs').addEventListener('keydown', e => {
   setView(tabs[n].dataset.view);
 });
 
-/* =========================================================
-   Datos: ejemplo y borrado
-   ========================================================= */
+
 function refreshAll(){
   renderProfile();
   renderToday();
@@ -1371,15 +1336,7 @@ $('#btn-clear').addEventListener('click', e => {
   refreshAll();
 });
 
-/* =========================================================
-   Exportar / importar datos
-   Formato versionado: cada sesión conserva TODOS sus campos al
-   exportar, incluidos los que una versión futura pueda añadir.
-   Al importar solo se exige t (marca de tiempo) y d (día); el
-   resto de campos que falten se normalizan con valores por
-   defecto seguros, así un archivo de una versión distinta
-   (anterior o posterior) siempre se puede volver a cargar.
-   ========================================================= */
+
 const EXPORT_VERSION = 1;
 let ioTimer = 0;
 function setIo(msg){
@@ -1460,9 +1417,6 @@ $('#import-file').addEventListener('change', async e => {
   }
 });
 
-/* =========================================================
-   Inicio
-   ========================================================= */
 syncChips();
 updateIdleText();
 updateHud(performance.now());
