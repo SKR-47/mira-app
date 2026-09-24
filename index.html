@@ -1,0 +1,1476 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#000000">
+<title>Mira, entrenador de puntería</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Unbounded:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:dark;
+
+  --bg:#000;
+  --pink:#ff2ea6;
+  --pink-rgb:255 46 166;
+  --text:#ffe6f4;
+  --muted:#b98aa6;
+  --line:rgb(255 46 166 / .30);
+  --line-soft:rgb(255 46 166 / .14);
+  --display:'Unbounded','Arial Black',system-ui,sans-serif;
+  --body:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cg stroke='%23ff2ea6' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M13 2v6M13 18v6M2 13h6M18 13h6'/%3E%3C/g%3E%3Ccircle cx='13' cy='13' r='1.6' fill='%23ff2ea6'/%3E%3C/svg%3E") 13 13, crosshair;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:#000}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--text);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.wrap{max-width:1040px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
+
+/* ---------- cabecera ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:rgb(0 0 0 / .92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line-soft)}
+.top .bar{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;min-height:60px;padding:10px 0}
+.brandrow{display:flex;align-items:center;gap:16px}
+.brand{font:500 1.3rem/1 var(--display);color:var(--pink);letter-spacing:-.03em}
+.tabs{display:flex;gap:clamp(14px,3.4vw,30px)}
+.tab{all:unset;cursor:pointer;font:500 .95rem var(--body);color:var(--muted);padding:8px 2px;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.tab:hover{color:var(--text)}
+.tab[aria-selected="true"]{color:var(--pink);border-bottom-color:var(--pink)}
+.tab:focus-visible{outline:2px solid var(--text);outline-offset:4px;border-radius:4px}
+
+.profile{display:flex;align-items:center;gap:10px;padding:5px 6px 5px 14px;border:1px solid var(--line);border-radius:999px}
+.profile .lvl{font:600 .82rem var(--display);color:#000;background:var(--pink);border-radius:999px;padding:4px 10px;letter-spacing:-.01em;white-space:nowrap}
+.profile .who{display:flex;flex-direction:column;gap:2px;min-width:74px}
+.profile .rk{font-size:.78rem;color:var(--text);white-space:nowrap}
+.profile .rk b{color:var(--pink)}
+.profile .xpbar{width:100%;height:3px;border-radius:2px;background:var(--line-soft);overflow:hidden}
+.profile .xpbar>i{display:block;height:100%;width:0%;background:var(--pink);border-radius:2px;transition:width .5s ease}
+
+.view{padding:clamp(22px,4vw,40px) 0 56px}
+
+/* ---------- controles ---------- */
+.settings{display:flex;flex-wrap:wrap;gap:12px 30px;margin-bottom:16px;transition:opacity .2s}
+.settings[inert]{opacity:.3}
+.group{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
+.group-label{color:var(--muted);font-size:.9rem;margin-right:2px}
+.chip{font:500 .9rem var(--body);color:var(--pink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 15px;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.chip:hover{border-color:var(--pink)}
+.chip[aria-pressed="true"]{background:var(--pink);border-color:var(--pink);color:#000}
+.btn{font:600 .95rem var(--body);border-radius:999px;padding:11px 24px;border:1px solid var(--pink);background:transparent;color:var(--pink);cursor:pointer;transition:background .15s}
+.btn:hover{background:rgb(var(--pink-rgb) / .14)}
+.btn.primary{background:var(--pink);color:#000}
+.btn.primary:hover{background:#ff5cbb}
+.btn:disabled{opacity:.35;cursor:default}
+.icon-btn{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--pink);cursor:pointer;transition:border-color .15s}
+.icon-btn:hover:not(:disabled){border-color:var(--pink)}
+.icon-btn:disabled{opacity:.25;cursor:default}
+
+.ranked-note{margin:0 0 20px;color:var(--muted);font-size:.88rem}
+.ranked-note b{color:var(--pink);font-weight:600}
+
+/* ---------- entrenar ---------- */
+.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:16px;margin-bottom:16px}
+.hud>div{display:flex;flex-direction:column}
+.num{font:600 clamp(1.7rem,5.4vw,2.9rem)/1.1 var(--display);color:var(--pink);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.hud .cap{color:var(--muted);font-size:.85rem}
+.hud .bot .num{color:var(--text)}
+
+.arena{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#000}
+#arena{display:block;width:100%;height:clamp(290px,58vh,560px);touch-action:none;user-select:none;-webkit-user-select:none;cursor:var(--cursor)}
+.ov-idle{all:unset;box-sizing:border-box;position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;padding:0 24px clamp(20px,7%,44px);text-align:center;cursor:var(--cursor)}
+.ov-idle:focus-visible{outline:2px solid var(--text);outline-offset:-8px}
+.idle-title{font:500 clamp(1.05rem,2.6vw,1.45rem)/1.2 var(--display);color:var(--pink)}
+.idle-sub{color:var(--muted);font-size:.92rem}
+.ov-res{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;overflow:auto;padding:24px;text-align:center;background:rgb(0 0 0 / .9)}
+.ov-res>:first-child{margin-top:auto}
+.ov-res>:last-child{margin-bottom:auto}
+.res-badge{margin:0 0 14px;padding:4px 14px;border:1px solid var(--pink);border-radius:999px;color:var(--pink);font-size:.85rem;display:inline-block}
+.res-score{font:600 clamp(3rem,11vw,5.5rem)/1 var(--display);color:var(--pink);letter-spacing:-.04em;text-shadow:0 0 28px rgb(var(--pink-rgb) / .55)}
+.res-unit{margin:8px 0 22px;color:var(--muted)}
+.res-vs{display:flex;align-items:center;justify-content:center;gap:18px;margin:0 0 22px;font:600 1.1rem var(--display)}
+.res-vs .side{display:flex;flex-direction:column;align-items:center;gap:4px}
+.res-vs .side span:first-child{font-size:.72rem;font-family:var(--body);font-weight:500;color:var(--muted)}
+.res-vs .mid{color:var(--muted);font:400 .85rem var(--body)}
+.res-stats{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 34px;margin:0 0 18px}
+.res-stats>div{display:flex;flex-direction:column-reverse;align-items:center}
+.res-stats dd{margin:0;font:600 1.3rem var(--display);color:var(--text)}
+.res-stats dt{color:var(--muted);font-size:.85rem}
+.res-xp{margin:0 0 26px;color:var(--muted);font-size:.9rem}
+.res-xp b{color:var(--pink);font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.res-note{margin:18px 0 0;color:var(--muted);font-size:.85rem}
+.today{margin:18px 0 0;color:var(--muted)}
+
+/* ---------- calendario ---------- */
+.cal-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(28px,5vw,60px);align-items:start}
+.cal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.cal-title{margin:0;font:500 clamp(1.3rem,3.6vw,1.9rem)/1.1 var(--display);letter-spacing:-.02em;text-transform:capitalize}
+.cal-nav{display:flex;align-items:center;gap:8px}
+.dow,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.dow span{text-align:center;color:var(--muted);font-size:.8rem;padding-bottom:6px}
+.day{position:relative;aspect-ratio:1;display:flex;align-items:flex-start;padding:7px 8px;border:1px solid var(--line-soft);border-radius:8px;background:transparent;color:var(--muted);font:500 .95rem var(--body);cursor:pointer;transition:border-color .15s}
+.day:hover:not(:disabled){border-color:var(--pink)}
+.day:disabled{opacity:.28;cursor:default}
+.day.today{font-weight:700;color:var(--text)}
+.day.today::after{content:"";position:absolute;left:8px;bottom:8px;width:5px;height:5px;border-radius:50%;background:currentColor}
+.day[aria-pressed="true"]{outline:2px solid var(--pink);outline-offset:2px}
+.day:focus-visible{outline:2px solid var(--text);outline-offset:3px}
+.day[data-l="1"],.lg[data-l="1"]{background:rgb(var(--pink-rgb) / .2);border-color:transparent;color:var(--text)}
+.day[data-l="2"],.lg[data-l="2"]{background:rgb(var(--pink-rgb) / .42);border-color:transparent;color:var(--text)}
+.day[data-l="3"],.lg[data-l="3"]{background:rgb(var(--pink-rgb) / .72);border-color:transparent;color:#fff}
+.day[data-l="4"],.lg[data-l="4"]{background:var(--pink);border-color:transparent;color:#000}
+.legend{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:16px;color:var(--muted);font-size:.8rem}
+.lg{width:14px;height:14px;border-radius:4px;border:1px solid var(--line-soft)}
+.lg[data-l]:not([data-l="0"]){border-color:transparent}
+
+.facts{display:flex;flex-wrap:wrap;gap:16px 34px;margin-bottom:30px}
+.facts>div{display:flex;flex-direction:column}
+.facts .cap{color:var(--muted);font-size:.85rem}
+.detail h2{margin:0 0 6px;font:500 1.2rem/1.3 var(--display);letter-spacing:-.02em}
+.muted{color:var(--muted)}
+.sess{list-style:none;margin:20px 0 0;padding:0}
+.sess li{display:grid;grid-template-columns:auto 1fr auto;gap:2px 14px;align-items:baseline;padding:14px 0;border-top:1px solid var(--line-soft)}
+.sess .t{color:var(--muted);font-variant-numeric:tabular-nums}
+.sess .s{font:600 1.15rem var(--display);color:var(--pink)}
+.sess .meta{grid-column:2 / 4;color:var(--muted);font-size:.88rem}
+.sess .tag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;border:1px solid var(--line);font-size:.72rem;color:var(--muted);vertical-align:middle}
+.sess .tag.win{color:#000;background:var(--pink);border-color:var(--pink)}
+.sess .tag.loss{color:var(--muted)}
+.detail .btn{margin-top:18px}
+
+/* ---------- gráficas ---------- */
+.chart-controls{display:flex;flex-wrap:wrap;gap:14px 34px;margin-bottom:28px}
+.chart-summary{margin-bottom:22px}
+.big{font:600 clamp(2.5rem,8vw,4.2rem)/1 var(--display);color:var(--pink);letter-spacing:-.04em;text-shadow:0 0 30px rgb(var(--pink-rgb) / .5)}
+.big small{font:500 .38em var(--display);letter-spacing:0;margin-left:.35em;text-shadow:none}
+.chart-summary p{margin:10px 0 0;color:var(--muted)}
+.chart{position:relative;border-radius:8px;touch-action:pan-y}
+.chart:focus-visible{outline-offset:6px}
+#chart-svg svg{display:block;overflow:visible}
+.gl{stroke:var(--line-soft);stroke-width:1}
+.ax{fill:var(--muted);font:12px var(--body)}
+.ax.now{fill:var(--pink);font-weight:700}
+.line{fill:none;stroke:var(--pink);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round;filter:drop-shadow(0 0 6px rgb(var(--pink-rgb) / .85))}
+.dot{fill:#000;stroke:var(--pink);stroke-width:2}
+.sdot{fill:rgb(var(--pink-rgb) / .35)}
+.guide{stroke:var(--line);stroke-width:1;stroke-dasharray:3 4}
+.ring{fill:none;stroke:var(--pink);stroke-width:2;filter:drop-shadow(0 0 6px var(--pink))}
+.tip{position:absolute;left:0;top:0;pointer-events:none;background:#000;border:1px solid var(--pink);border-radius:8px;padding:8px 12px;font-size:.85rem;line-height:1.35;white-space:nowrap;z-index:2}
+.tip b{color:var(--pink);font-weight:700}
+.tip .d{color:var(--muted)}
+.chart-empty{border:1px dashed var(--line);border-radius:8px;padding:48px 24px;text-align:center;color:var(--muted)}
+.chart-empty .btn{margin-top:16px}
+
+/* ---------- pie ---------- */
+.foot{border-top:1px solid var(--line-soft);padding:20px 0 32px;color:var(--muted);font-size:.85rem}
+.foot .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px}
+.foot p{margin:0}
+.foot .links{display:flex;gap:20px}
+.foot .links{flex-wrap:wrap}
+.linkbtn{background:none;border:0;padding:4px 0;color:var(--muted);font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.linkbtn:hover{color:var(--pink)}
+.io-status{width:100%;margin:10px 0 0;min-height:1.2em;color:var(--pink)}
+
+@media (max-width:820px){
+  .cal-layout{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .top .bar{justify-content:flex-start}
+  .profile{order:3;width:100%}
+  .profile .who{min-width:0;flex:1}
+}
+@media (max-width:420px){
+  .tabs{gap:14px}
+  .tab{font-size:.88rem}
+  .day{padding:5px 6px;font-size:.85rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap bar">
+    <div class="brandrow">
+      <div class="brand">mira</div>
+      <nav class="tabs" role="tablist" aria-label="Secciones">
+        <button class="tab" role="tab" id="tab-train" data-view="train" aria-selected="true" aria-controls="view-train">Entrenar</button>
+        <button class="tab" role="tab" id="tab-cal" data-view="cal" aria-selected="false" aria-controls="view-cal" tabindex="-1">Calendario</button>
+        <button class="tab" role="tab" id="tab-charts" data-view="charts" aria-selected="false" aria-controls="view-charts" tabindex="-1">Gráficas</button>
+        <button class="tab" role="tab" id="tab-friends" data-view="friends" aria-selected="false" aria-controls="view-friends" tabindex="-1">Amigos</button>
+      </nav>
+    </div>
+    <div class="profile" id="profile-chip">
+      <span class="lvl" id="p-lvl">Nv. 1</span>
+      <span class="who">
+        <span class="rk" id="p-rank">Bronce · <b>1000</b></span>
+        <span class="xpbar"><i id="p-xpbar"></i></span>
+      </span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ENTRENAR -->
+  <section class="view" id="view-train" role="tabpanel" aria-labelledby="tab-train">
+    <div class="settings" id="settings">
+      <div class="group" role="group" aria-labelledby="l-mode">
+        <span class="group-label" id="l-mode">Modo</span>
+        <button class="chip" data-k="mode" data-v="classic" title="Un objetivo cada vez">Clásico</button>
+        <button class="chip" data-k="mode" data-v="burst" title="Tres objetivos a la vez">Ráfaga</button>
+        <button class="chip" data-k="mode" data-v="ranked" title="Compite contra un bot de tu nivel">Ranked</button>
+      </div>
+      <div class="group" role="group" aria-labelledby="l-size">
+        <span class="group-label" id="l-size">Tamaño</span>
+        <button class="chip" data-k="size" data-v="s">Pequeño</button>
+        <button class="chip" data-k="size" data-v="m">Medio</button>
+        <button class="chip" data-k="size" data-v="l">Grande</button>
+      </div>
+      <div class="group" role="group" aria-labelledby="l-dur">
+        <span class="group-label" id="l-dur">Duración</span>
+        <button class="chip" data-k="dur" data-v="30">30 s</button>
+        <button class="chip" data-k="dur" data-v="60">60 s</button>
+      </div>
+    </div>
+
+    <p class="ranked-note" id="ranked-note" hidden></p>
+
+    <div class="hud">
+      <div><span class="num" id="h-score">0</span><span class="cap">puntos</span></div>
+      <div class="bot" id="h-bot-wrap" hidden><span class="num" id="h-bot">0</span><span class="cap">bot</span></div>
+      <div><span class="num" id="h-time">30.0</span><span class="cap">segundos</span></div>
+      <div><span class="num" id="h-acc">–</span><span class="cap">precisión</span></div>
+    </div>
+
+    <div class="arena">
+      <canvas id="arena" role="img" aria-label="Zona de entrenamiento: haz clic en los objetivos rosas"></canvas>
+      <button class="ov-idle" id="ov-idle" type="button">
+        <span class="idle-title" id="idle-title">Haz clic para empezar</span>
+        <span class="idle-sub" id="idle-sub"></span>
+      </button>
+      <div class="ov-res" id="ov-res" hidden></div>
+    </div>
+
+    <p class="today" id="today"></p>
+  </section>
+
+  <!-- CALENDARIO -->
+  <section class="view" id="view-cal" role="tabpanel" aria-labelledby="tab-cal" hidden>
+    <div class="cal-layout">
+      <div>
+        <div class="cal-head">
+          <h2 class="cal-title" id="cal-title"></h2>
+          <div class="cal-nav">
+            <button class="icon-btn" id="cal-prev" type="button" aria-label="Mes anterior">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+            </button>
+            <button class="chip" id="cal-today" type="button">Hoy</button>
+            <button class="icon-btn" id="cal-next" type="button" aria-label="Mes siguiente">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="dow" aria-hidden="true"><span>lun</span><span>mar</span><span>mié</span><span>jue</span><span>vie</span><span>sáb</span><span>dom</span></div>
+        <div class="days" id="cal-days" role="group" aria-label="Días del mes"></div>
+        <div class="legend" aria-hidden="true">
+          <span>menos</span>
+          <i class="lg" data-l="0"></i><i class="lg" data-l="1"></i><i class="lg" data-l="2"></i><i class="lg" data-l="3"></i><i class="lg" data-l="4"></i>
+          <span>más sesiones</span>
+        </div>
+      </div>
+      <aside class="detail" id="cal-detail" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <!-- GRÁFICAS -->
+  <section class="view" id="view-charts" role="tabpanel" aria-labelledby="tab-charts" hidden>
+    <div class="chart-controls">
+      <div class="group" role="group" aria-labelledby="l-metric">
+        <span class="group-label" id="l-metric">Mostrar</span>
+        <button class="chip" data-k="metric" data-v="score">Puntos</button>
+        <button class="chip" data-k="metric" data-v="acc">Precisión</button>
+        <button class="chip" data-k="metric" data-v="rt">Reacción</button>
+        <button class="chip" data-k="metric" data-v="hits">Objetivos</button>
+        <button class="chip" data-k="metric" data-v="rating">Ranked</button>
+      </div>
+      <div class="group" role="group" aria-labelledby="l-range">
+        <span class="group-label" id="l-range">Periodo</span>
+        <button class="chip" data-k="range" data-v="7">7 días</button>
+        <button class="chip" data-k="range" data-v="14">14 días</button>
+        <button class="chip" data-k="range" data-v="30">30 días</button>
+      </div>
+    </div>
+
+    <div class="chart-summary">
+      <div class="big" id="ch-big"></div>
+      <p id="ch-caption"></p>
+    </div>
+
+    <div class="chart" id="chart" tabindex="0" role="group">
+      <div id="chart-svg"></div>
+      <div class="tip" id="tip" hidden></div>
+      <div class="chart-empty" id="chart-empty" hidden>
+        <p id="chart-empty-txt">No hay sesiones en este periodo.<br>Entrena una para ver tu evolución día a día.</p>
+        <button class="btn primary" id="empty-go" type="button">Entrenar ahora</button>
+      </div>
+    </div>
+    <div class="sr" id="chart-sr" aria-live="polite"></div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Tus sesiones se guardan solo en este navegador.</p>
+    <div class="links">
+      <button class="linkbtn" id="btn-export" type="button">Exportar datos</button>
+      <button class="linkbtn" id="btn-import" type="button">Importar datos</button>
+      <button class="linkbtn" id="btn-sample" type="button">Cargar datos de ejemplo</button>
+      <button class="linkbtn" id="btn-clear" type="button">Borrar historial</button>
+      <input type="file" id="import-file" accept="application/json,.json" hidden>
+      <p class="io-status" id="io-status" aria-live="polite"></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+'use strict';
+
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+/* =========================================================
+   Almacenamiento (localStorage con respaldo en memoria)
+   ========================================================= */
+const KEY_S = 'mira.sessions.v1';
+const KEY_C = 'mira.config.v1';
+const KEY_P = 'mira.profile.v1';
+const memory = {};
+function load(key, fallback){
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return key in memory ? memory[key] : fallback;
+}
+function save(key, val){
+  memory[key] = val;
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+}
+
+/* =========================================================
+   Estado
+   ========================================================= */
+let sessions = load(KEY_S, []);
+if (!Array.isArray(sessions)) sessions = [];
+sessions = sessions.filter(s => s && typeof s.t === 'number' && typeof s.d === 'string');
+
+const cfgSaved = load(KEY_C, {});
+const cfg = {
+  mode: ['classic', 'burst', 'ranked'].includes(cfgSaved.mode) ? cfgSaved.mode : 'classic',
+  size: ['s', 'm', 'l'].includes(cfgSaved.size) ? cfgSaved.size : 'm',
+  dur:  [30, 60].includes(cfgSaved.dur) ? cfgSaved.dur : 30
+};
+
+const profSaved = load(KEY_P, {});
+const profile = {
+  xp: Number.isFinite(profSaved.xp) ? profSaved.xp : 0,
+  rating: Number.isFinite(profSaved.rating) ? profSaved.rating : 1000,
+  wins: profSaved.wins || 0,
+  losses: profSaved.losses || 0,
+  draws: profSaved.draws || 0
+};
+
+let view = 'train';
+let chartMetric = 'score';
+let chartRange = 14;
+let activeIdx = null;
+let calMonth = new Date(); calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth(), 1);
+
+const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const COARSE = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+
+/* =========================================================
+   Utilidades
+   ========================================================= */
+const PINK = '#ff2ea6';
+const MODES = { classic: 'Clásico', burst: 'Ráfaga', ranked: 'Ranked' };
+const SIZE_NAMES = { s: 'pequeño', m: 'medio', l: 'grande' };
+const SIZES = {
+  s: { f: 0.020, min: 13, mult: 1.4 },
+  m: { f: 0.030, min: 19, mult: 1.0 },
+  l: { f: 0.043, min: 27, mult: 0.75 }
+};
+
+const pad = n => String(n).padStart(2, '0');
+const dayKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const fromKey = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+const nf = n => Math.round(n).toLocaleString('es-ES');
+const cap1 = s => s.charAt(0).toUpperCase() + s.slice(1);
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const fmtLong = new Intl.DateTimeFormat('es', { weekday: 'long', day: 'numeric', month: 'long' });
+const fmtWd = new Intl.DateTimeFormat('es', { weekday: 'short' });
+const fmtMon = new Intl.DateTimeFormat('es', { month: 'short' });
+const fmtMonLong = new Intl.DateTimeFormat('es', { month: 'long' });
+
+function groupByDay(){
+  const m = new Map();
+  for (const s of sessions){
+    if (!m.has(s.d)) m.set(s.d, []);
+    m.get(s.d).push(s);
+  }
+  return m;
+}
+const sum = (list, k) => list.reduce((a, s) => a + (s[k] || 0), 0);
+function agg(list){
+  const n = list.length;
+  const hits = sum(list, 'hits'), miss = sum(list, 'miss');
+  return {
+    n, hits, miss,
+    score: n ? sum(list, 'score') / n : 0,
+    best: Math.max(...list.map(s => s.score)),
+    acc: hits + miss ? hits / (hits + miss) * 100 : 0,
+    rt: hits ? list.reduce((a, s) => a + s.rt * s.hits, 0) / hits : 0
+  };
+}
+function streak(g){
+  const d = new Date(); d.setHours(0, 0, 0, 0);
+  if (!g.has(dayKey(d))) d.setDate(d.getDate() - 1);
+  let n = 0;
+  while (g.has(dayKey(d))){ n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+function calcScore(hits, rt, miss, size, dur){
+  const bonus = Math.max(0, 1 - rt / 1200) * 100;
+  const raw = hits * (100 + bonus) * SIZES[size].mult - miss * 25;
+  return Math.max(0, Math.round(raw * 60 / dur));
+}
+
+/* =========================================================
+   Niveles y XP
+   ========================================================= */
+function xpForLevel(lvl){ return Math.round(70 * Math.pow(lvl, 1.42) + 30 * lvl); }
+function levelFromXp(xp){
+  let lvl = 1, need = xpForLevel(1), rem = Math.max(0, xp);
+  while (rem >= need){ rem -= need; lvl++; need = xpForLevel(lvl); }
+  return { level: lvl, into: rem, need };
+}
+function xpGain(s){
+  let base = Math.round(s.score / 12) + Math.round(s.hits * 0.6);
+  if (s.mode === 'ranked'){
+    base += s.result === 'win' ? 45 : s.result === 'draw' ? 22 : 12;
+  }
+  return Math.max(6, base);
+}
+
+/* =========================================================
+   Ranked: rangos y bots
+   ========================================================= */
+const TIERS = [
+  { min: 0,    name: 'Bronce' },
+  { min: 1000, name: 'Plata' },
+  { min: 1200, name: 'Oro' },
+  { min: 1400, name: 'Platino' },
+  { min: 1600, name: 'Diamante' },
+  { min: 1800, name: 'Mira' }
+];
+function tierFor(rating){
+  let t = TIERS[0];
+  for (const x of TIERS) if (rating >= x.min) t = x;
+  return t;
+}
+function botStats(rating, dur, size){
+  const t = clamp((rating - 700) / 1300, 0, 1);
+  const acc = clamp(58 + t * 38 + (Math.random() - 0.5) * 8, 45, 98);
+  const rt = Math.round(clamp(760 - t * 430 + (Math.random() - 0.5) * 60, 190, 820));
+  const rate = 0.55 + t * 0.9;
+  const hits = Math.max(3, Math.round(rate * dur * (0.85 + Math.random() * 0.3)));
+  const miss = Math.max(0, Math.round(hits * (100 / acc - 1)));
+  return { hits, miss, acc: Math.round(acc * 10) / 10, rt, score: calcScore(hits, rt, miss, size, dur) };
+}
+function eloUpdate(rating, oppRating, result){
+  const K = 32;
+  const expected = 1 / (1 + Math.pow(10, (oppRating - rating) / 400));
+  const r = result === 'win' ? 1 : result === 'draw' ? 0.5 : 0;
+  return Math.max(0, Math.round(rating + K * (r - expected)));
+}
+
+/* El perfil (nivel, XP, rango) se recalcula siempre a partir del historial
+   de sesiones en lugar de guardarse "a mano". Así, cargar datos de ejemplo,
+   importar un archivo o borrar el historial dejan el perfil consistente
+   automáticamente, sin lógica duplicada. */
+function syncProfileFromSessions(){
+  const sorted = sessions.slice().sort((a, b) => a.t - b.t);
+  let xp = 0, wins = 0, losses = 0, draws = 0, rating = 1000;
+  for (const s of sorted){
+    xp += xpGain(s);
+    if (s.mode === 'ranked' && typeof s.ratingAfter === 'number'){
+      rating = s.ratingAfter;
+      if (s.result === 'win') wins++;
+      else if (s.result === 'loss') losses++;
+      else if (s.result === 'draw') draws++;
+    }
+  }
+  profile.xp = xp; profile.rating = rating;
+  profile.wins = wins; profile.losses = losses; profile.draws = draws;
+  save(KEY_P, profile);
+}
+
+/* =========================================================
+   Cabecera de perfil
+   ========================================================= */
+function renderProfile(){
+  const { level, into, need } = levelFromXp(profile.xp);
+  const tier = tierFor(profile.rating);
+  $('#p-lvl').textContent = `Nv. ${level}`;
+  $('#p-rank').innerHTML = `${tier.name} · <b>${nf(profile.rating)}</b>`;
+  $('#p-xpbar').style.width = Math.round(into / need * 100) + '%';
+}
+
+/* =========================================================
+   Juego
+   ========================================================= */
+const canvas = $('#arena');
+const ctx = canvas.getContext('2d');
+const ovIdle = $('#ov-idle');
+const ovRes = $('#ov-res');
+const settings = $('#settings');
+const hs = $('#h-score'), ht = $('#h-time'), ha = $('#h-acc');
+const hBotWrap = $('#h-bot-wrap'), hBot = $('#h-bot');
+
+let W = 0, H = 0, dpr = 1, raf = 0;
+const G = { phase: 'idle', t0: 0, start: 0, end: 0, targets: [], fx: [], hits: 0, miss: 0, rtSum: 0, raw: 0, last: null, bot: null, botRating: null };
+
+try { document.fonts && document.fonts.load('600 64px Unbounded'); } catch (e) {}
+
+const radius = () => Math.max(SIZES[cfg.size].min, W * SIZES[cfg.size].f);
+
+function resize(){
+  const r = canvas.getBoundingClientRect();
+  if (!r.width) return;
+  dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  W = r.width; H = r.height;
+  canvas.width = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  draw(performance.now());
+}
+
+function drawTarget(x, y, rad, alpha){
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.shadowColor = PINK;
+  ctx.shadowBlur = 30;
+  ctx.strokeStyle = PINK;
+  ctx.lineWidth = Math.max(2, rad * 0.09);
+  ctx.beginPath(); ctx.arc(x, y, rad, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = PINK;
+  ctx.beginPath(); ctx.arc(x, y, rad * 0.42, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+function draw(now){
+  if (!W) return;
+  ctx.clearRect(0, 0, W, H);
+  const r = radius();
+
+  if (G.phase === 'idle'){
+    drawTarget(W / 2, H * 0.4, r * 2.2, 1);
+    return;
+  }
+  if (G.phase === 'countdown'){
+    const el = now - G.t0;
+    const n = Math.max(1, 3 - Math.floor(el / 500));
+    const a = RM ? 1 : 1 - (el % 500) / 500 * 0.55;
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.fillStyle = PINK;
+    ctx.shadowColor = PINK; ctx.shadowBlur = 34;
+    ctx.font = `600 ${Math.min(96, H * 0.28)}px Unbounded, system-ui, sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(String(n), W / 2, H / 2);
+    ctx.restore();
+    return;
+  }
+  if (G.phase === 'play'){
+    for (const t of G.targets){
+      const k = RM ? 1 : Math.min(1, (now - t.born) / 140);
+      const e = 1 - Math.pow(1 - k, 3);
+      drawTarget(t.x * W, t.y * H, r * (0.55 + 0.45 * e), 0.35 + 0.65 * e);
+    }
+    G.fx = G.fx.filter(f => now - f.t < 320);
+    for (const f of G.fx){
+      const k = (now - f.t) / 320;
+      ctx.save();
+      ctx.globalAlpha = 1 - k;
+      ctx.strokeStyle = PINK;
+      ctx.lineWidth = 2;
+      if (f.kind === 'hit'){
+        ctx.shadowColor = PINK; ctx.shadowBlur = 16;
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.r * (1 + k * 0.9), 0, Math.PI * 2); ctx.stroke();
+      } else {
+        const s = 6;
+        ctx.beginPath();
+        ctx.moveTo(f.x - s, f.y - s); ctx.lineTo(f.x + s, f.y + s);
+        ctx.moveTo(f.x + s, f.y - s); ctx.lineTo(f.x - s, f.y + s);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+}
+
+function spawn(now){
+  const r = radius(), p = r + 10;
+  for (let tries = 0; tries < 40; tries++){
+    const x = p + Math.random() * Math.max(1, W - 2 * p);
+    const y = p + Math.random() * Math.max(1, H - 2 * p);
+    const apart = G.targets.every(t => Math.hypot(t.x * W - x, t.y * H - y) > r * 3);
+    const far = cfg.mode === 'burst' || !G.last || Math.hypot(G.last.x * W - x, G.last.y * H - y) > Math.min(W, H) * 0.25;
+    if ((apart && far) || tries === 39){
+      G.targets.push({ x: x / W, y: y / H, born: now });
+      return;
+    }
+  }
+}
+
+function setText(el, txt){ if (el.textContent !== txt) el.textContent = txt; }
+
+function botShown(now){
+  if (!G.bot) return 0;
+  if (G.phase === 'done') return G.bot.score;
+  if (G.phase !== 'play') return 0;
+  const frac = clamp((now - G.start) / (cfg.dur * 1000), 0, 1);
+  const wobble = Math.sin(frac * 23 + (G.bot.rt % 7)) * G.bot.score * 0.05 * (1 - frac);
+  return Math.max(0, Math.round(G.bot.score * frac + wobble));
+}
+
+function updateHud(now){
+  const live = G.phase === 'play' || G.phase === 'done';
+  setText(hs, nf(live ? Math.max(0, G.raw * 60 / cfg.dur) : 0));
+  let left = cfg.dur;
+  if (G.phase === 'play') left = Math.max(0, (G.end - now) / 1000);
+  if (G.phase === 'done') left = 0;
+  setText(ht, left.toFixed(1));
+  const tot = G.hits + G.miss;
+  setText(ha, tot ? Math.round(G.hits / tot * 100) + '\u00a0%' : '–');
+  hBotWrap.hidden = cfg.mode !== 'ranked';
+  if (cfg.mode === 'ranked') setText(hBot, nf(botShown(now)));
+}
+
+function tick(now){
+  if (G.phase === 'countdown' && now - G.t0 >= 1500){
+    G.phase = 'play';
+    G.start = now;
+    G.end = now + cfg.dur * 1000;
+    const n = cfg.mode === 'burst' ? 3 : 1;
+    for (let i = 0; i < n; i++) spawn(now);
+  } else if (G.phase === 'play' && now >= G.end){
+    finish();
+    return;
+  }
+  draw(now);
+  updateHud(now);
+  if (G.phase === 'countdown' || G.phase === 'play') raf = requestAnimationFrame(tick);
+}
+
+function startGame(){
+  cancelAnimationFrame(raf);
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  const bot = cfg.mode === 'ranked'
+    ? (() => { const r = clamp(profile.rating + (Math.random() * 160 - 80), 300, 3000); return { rating: r, stats: botStats(r, cfg.dur, cfg.size) }; })()
+    : null;
+  Object.assign(G, {
+    phase: 'countdown', t0: performance.now(), targets: [], fx: [],
+    hits: 0, miss: 0, rtSum: 0, raw: 0, last: null,
+    bot: bot ? bot.stats : null, botRating: bot ? bot.rating : null
+  });
+  ovIdle.hidden = true;
+  ovRes.hidden = true;
+  settings.setAttribute('inert', '');
+  updateHud(G.t0);
+  raf = requestAnimationFrame(tick);
+}
+
+function cancelGame(){
+  cancelAnimationFrame(raf);
+  Object.assign(G, { phase: 'idle', targets: [], fx: [], hits: 0, miss: 0, rtSum: 0, raw: 0, last: null, bot: null, botRating: null });
+  ovIdle.hidden = false;
+  ovRes.hidden = true;
+  settings.removeAttribute('inert');
+  updateHud(performance.now());
+  draw(performance.now());
+}
+
+function finish(){
+  cancelAnimationFrame(raf);
+  G.phase = 'done';
+  const { hits, miss } = G;
+  const tot = hits + miss;
+  const acc = tot ? hits / tot * 100 : 0;
+  const rt = hits ? G.rtSum / hits : 0;
+  const score = Math.max(0, Math.round(G.raw * 60 / cfg.dur));
+  const prevBest = sessions.reduce((m, s) => Math.max(m, s.score), 0);
+  const s = {
+    t: Date.now(), d: dayKey(new Date()),
+    mode: cfg.mode, size: cfg.size, dur: cfg.dur,
+    hits, miss, acc: Math.round(acc * 10) / 10, rt: Math.round(rt), score
+  };
+
+  let rankedInfo = null;
+  if (cfg.mode === 'ranked' && G.bot){
+    const result = score > G.bot.score ? 'win' : score < G.bot.score ? 'loss' : 'draw';
+    const before = profile.rating;
+    const after = eloUpdate(before, G.botRating, result);
+    s.result = result; s.botScore = G.bot.score; s.oppRating = Math.round(G.botRating);
+    s.ratingBefore = before; s.ratingAfter = after; s.delta = after - before;
+    rankedInfo = { result, bot: G.bot, before, after, delta: after - before };
+  }
+
+  let levelBefore = null, levelAfter = null, gained = 0;
+  if (tot > 0){
+    levelBefore = levelFromXp(profile.xp).level;
+    gained = xpGain(s);
+    sessions.push(s);
+    save(KEY_S, sessions);
+    syncProfileFromSessions();
+    levelAfter = levelFromXp(profile.xp).level;
+  }
+
+  settings.removeAttribute('inert');
+  draw(performance.now());
+  updateHud(performance.now());
+  renderProfile();
+  showResults(s, tot > 0, gained, levelAfter, levelAfter > levelBefore, rankedInfo);
+  renderToday();
+}
+
+function showResults(s, saved, gained, levelAfter, leveledUp, ranked){
+  ovIdle.hidden = true;
+  ovRes.hidden = false;
+
+  let rankedBlock = '';
+  if (ranked){
+    const label = ranked.result === 'win' ? 'Victoria' : ranked.result === 'draw' ? 'Empate' : 'Derrota';
+    const tier = tierFor(ranked.after);
+    const sign = ranked.delta > 0 ? '+' : '';
+    rankedBlock = `
+      <p class="res-badge">${label} contra el bot</p>
+      <div class="res-vs">
+        <span class="side"><span>Tú</span><span>${nf(s.score)}</span></span>
+        <span class="mid">vs</span>
+        <span class="side"><span>Bot</span><span>${nf(ranked.bot.score)}</span></span>
+      </div>
+      <p class="res-xp">${sign}${ranked.delta}\u00a0Elo · ahora <b>${nf(ranked.after)}</b> (${tier.name})</p>`;
+  }
+
+  ovRes.innerHTML = `
+    ${!ranked && leveledUp ? `<p class="res-badge">Subiste al nivel ${levelAfter}</p>` : ''}
+    ${rankedBlock}
+    <div class="res-score">${nf(s.score)}</div>
+    <p class="res-unit">puntos</p>
+    <dl class="res-stats">
+      <div><dt>objetivos</dt><dd>${s.hits}</dd></div>
+      <div><dt>precisión</dt><dd>${Math.round(s.acc)}\u00a0%</dd></div>
+      <div><dt>reacción</dt><dd>${s.hits ? s.rt + '\u00a0ms' : '–'}</dd></div>
+      <div><dt>fallos</dt><dd>${s.miss}</dd></div>
+    </dl>
+    ${saved ? `<p class="res-xp">+${gained}\u00a0XP${ranked && leveledUp ? ` · subiste al nivel ${levelAfter}` : ''}</p>` : ''}
+    <div class="actions">
+      <button class="btn primary" id="again" type="button" disabled>Jugar otra vez</button>
+      <button class="btn" id="see-charts" type="button">Ver gráficas</button>
+    </div>
+    <p class="res-note">${saved ? 'Sesión guardada en tu calendario.' : 'No se guardó la sesión porque no hubo ningún clic.'}</p>`;
+  const again = $('#again');
+  again.addEventListener('click', startGame);
+  $('#see-charts').addEventListener('click', () => setView('charts'));
+  setTimeout(() => { if (G.phase === 'done' && again.isConnected){ again.disabled = false; again.focus(); } }, 600);
+}
+
+canvas.addEventListener('pointerdown', e => {
+  if (G.phase !== 'play') return;
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const px = e.clientX - rect.left, py = e.clientY - rect.top;
+  const now = performance.now();
+  const R = radius() * 1.08;
+
+  let idx = -1, best = Infinity;
+  G.targets.forEach((t, i) => {
+    const d = Math.hypot(t.x * W - px, t.y * H - py);
+    if (d <= R && d < best){ best = d; idx = i; }
+  });
+
+  if (idx >= 0){
+    const t = G.targets[idx];
+    const rt = now - t.born;
+    G.hits++;
+    G.rtSum += rt;
+    G.raw += (100 + Math.max(0, 1 - rt / 1200) * 100) * SIZES[cfg.size].mult;
+    G.last = { x: t.x, y: t.y };
+    if (!RM) G.fx.push({ kind: 'hit', x: t.x * W, y: t.y * H, r: radius(), t: now });
+    G.targets.splice(idx, 1);
+    spawn(now);
+  } else {
+    G.miss++;
+    G.raw -= 25;
+    if (!RM) G.fx.push({ kind: 'miss', x: px, y: py, t: now });
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && (G.phase === 'play' || G.phase === 'countdown')){ cancelGame(); return; }
+  if (e.key === ' ' && view === 'train' && G.phase === 'idle'){
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (!['BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA'].includes(tag)){ e.preventDefault(); startGame(); }
+  }
+});
+ovIdle.addEventListener('click', startGame);
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && (G.phase === 'play' || G.phase === 'countdown')) cancelGame();
+});
+
+new ResizeObserver(() => resize()).observe($('.arena'));
+
+function updateIdleText(){
+  $('#idle-title').textContent = COARSE ? 'Toca para empezar' : 'Haz clic para empezar';
+  if (cfg.mode === 'ranked'){
+    const tier = tierFor(profile.rating);
+    $('#idle-sub').textContent = `Ranked, contra un bot a tu nivel, tamaño ${SIZE_NAMES[cfg.size]}, ${cfg.dur} s`;
+    $('#ranked-note').hidden = false;
+    $('#ranked-note').innerHTML = `Tu rango actual es <b>${tier.name}</b> con <b>${nf(profile.rating)}</b> puntos. El bot se ajusta a tu nivel.`;
+  } else {
+    $('#idle-sub').textContent = `${MODES[cfg.mode]}, tamaño ${SIZE_NAMES[cfg.size]}, ${cfg.dur} s`;
+    $('#ranked-note').hidden = true;
+  }
+  hBotWrap.hidden = cfg.mode !== 'ranked';
+}
+
+function renderToday(){
+  const g = groupByDay();
+  const list = g.get(dayKey(new Date())) || [];
+  let txt = list.length
+    ? `Hoy llevas ${plural(list.length, 'sesión', 'sesiones')} y tu mejor puntuación es ${nf(Math.max(...list.map(s => s.score)))}.`
+    : 'Aún no has entrenado hoy.';
+  const st = streak(g);
+  if (st > 1) txt += ` Racha de ${st} días.`;
+  $('#today').textContent = txt;
+}
+
+/* =========================================================
+   Calendario
+   ========================================================= */
+let selDay = dayKey(new Date());
+
+function renderCalendar(){
+  const g = groupByDay();
+  const y = calMonth.getFullYear(), m = calMonth.getMonth();
+  const monthName = fmtMonLong.format(calMonth);
+  $('#cal-title').textContent = `${monthName} ${y}`;
+
+  const off = (new Date(y, m, 1).getDay() + 6) % 7;
+  const dim = new Date(y, m + 1, 0).getDate();
+  const todayK = dayKey(new Date());
+  let html = '';
+  for (let i = 0; i < off; i++) html += '<span aria-hidden="true"></span>';
+  for (let d = 1; d <= dim; d++){
+    const key = `${y}-${pad(m + 1)}-${pad(d)}`;
+    const n = (g.get(key) || []).length;
+    const future = key > todayK;
+    const label = `${d} de ${monthName}, ${n ? plural(n, 'sesión', 'sesiones') : 'sin sesiones'}`;
+    html += `<button type="button" class="day${key === todayK ? ' today' : ''}" data-key="${key}" data-l="${Math.min(n, 4)}" aria-pressed="${key === selDay}" aria-label="${label}"${future ? ' disabled' : ''}>${d}</button>`;
+  }
+  $('#cal-days').innerHTML = html;
+
+  const now = new Date();
+  $('#cal-next').disabled = (y > now.getFullYear()) || (y === now.getFullYear() && m >= now.getMonth());
+}
+
+function renderDetail(){
+  const g = groupByDay();
+  const list = (g.get(selDay) || []).slice().sort((a, b) => a.t - b.t);
+  const todayK = dayKey(new Date());
+  const y = calMonth.getFullYear(), m = calMonth.getMonth();
+  const prefix = `${y}-${pad(m + 1)}-`;
+  let monthSessions = 0, monthDays = 0;
+  for (const [k, l] of g){ if (k.startsWith(prefix)){ monthSessions += l.length; monthDays++; } }
+
+  let h = `
+    <div class="facts">
+      <div><span class="num">${streak(g)}</span><span class="cap">días de racha</span></div>
+      <div><span class="num">${monthSessions}</span><span class="cap">sesiones en el mes</span></div>
+      <div><span class="num">${monthDays}</span><span class="cap">días entrenados</span></div>
+    </div>
+    <h2>${cap1(fmtLong.format(fromKey(selDay)))}</h2>`;
+
+  if (!list.length){
+    h += `<p class="muted">No hay sesiones este día.</p>`;
+    if (selDay === todayK) h += `<button class="btn primary" id="detail-go" type="button">Entrenar ahora</button>`;
+  } else {
+    const a = agg(list);
+    h += `<p class="muted">${plural(a.n, 'sesión', 'sesiones')}. Mejor puntuación ${nf(a.best)} y precisión media del ${Math.round(a.acc)}\u00a0%.</p><ul class="sess">`;
+    for (const s of list){
+      const time = new Date(s.t).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+      const tag = s.mode === 'ranked'
+        ? `<span class="tag${s.result === 'win' ? ' win' : ''}">${s.result === 'win' ? 'victoria' : s.result === 'draw' ? 'empate' : 'derrota'}${s.delta != null ? ` ${s.delta > 0 ? '+' : ''}${s.delta}` : ''}</span>`
+        : '';
+      h += `<li>
+        <span class="t">${time}</span>
+        <span>${MODES[s.mode] || s.mode}, ${SIZE_NAMES[s.size] || s.size}, ${s.dur} s${tag}</span>
+        <span class="s">${nf(s.score)}</span>
+        <span class="meta">${plural(s.hits, 'objetivo', 'objetivos')}, ${Math.round(s.acc)}\u00a0% de precisión${s.hits ? `, ${s.rt}\u00a0ms de reacción` : ''}</span>
+      </li>`;
+    }
+    h += '</ul>';
+  }
+  $('#cal-detail').innerHTML = h;
+  const go = $('#detail-go');
+  if (go) go.addEventListener('click', () => setView('train'));
+}
+
+$('#cal-days').addEventListener('click', e => {
+  const b = e.target.closest('.day');
+  if (!b || b.disabled) return;
+  selDay = b.dataset.key;
+  $$('#cal-days .day').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  renderDetail();
+});
+$('#cal-prev').addEventListener('click', () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() - 1, 1); renderCalendar(); renderDetail(); });
+$('#cal-next').addEventListener('click', () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1); renderCalendar(); renderDetail(); });
+$('#cal-today').addEventListener('click', () => {
+  const n = new Date();
+  calMonth = new Date(n.getFullYear(), n.getMonth(), 1);
+  selDay = dayKey(n);
+  renderCalendar(); renderDetail();
+});
+
+/* =========================================================
+   Gráficas diarias
+   ========================================================= */
+const METRICS = {
+  score: {
+    label: 'Puntos', get: a => a.score, sess: s => s.score, zero: true, better: 'up',
+    fmt: v => `${nf(v)} puntos`, axis: v => nf(v), big: v => [nf(v), 'puntos'],
+    cap: N => `de media por sesión en los últimos ${N} días`
+  },
+  acc: {
+    label: 'Precisión', get: a => a.acc, sess: s => s.acc, cap100: true, better: 'up',
+    fmt: v => `${v.toFixed(1).replace('.', ',')}\u00a0%`, axis: v => `${Math.round(v)}%`, big: v => [v.toFixed(1).replace('.', ','), '%'],
+    cap: N => `de precisión media en los últimos ${N} días`
+  },
+  rt: {
+    label: 'Reacción', get: a => a.hits ? a.rt : null, sess: s => s.hits ? s.rt : null, better: 'down',
+    fmt: v => `${nf(v)}\u00a0ms`, axis: v => nf(v), big: v => [nf(v), 'ms'],
+    cap: N => `de tiempo de reacción medio en los últimos ${N} días`
+  },
+  hits: {
+    label: 'Objetivos', get: a => a.hits, sess: null, zero: true, better: 'up',
+    fmt: v => `${nf(v)} objetivos`, axis: v => nf(v), big: v => [nf(v), 'objetivos'],
+    cap: N => `al día de media, contando los días que entrenaste en los últimos ${N}`
+  },
+  rating: {
+    label: 'Ranked', kind: 'rating', sess: null, better: 'up',
+    fmt: v => `${nf(v)}\u00a0Elo`, axis: v => nf(v), big: v => [nf(v), 'elo'],
+    cap: N => `de puntuación ranked en los últimos ${N} días`
+  }
+};
+
+function dailyVals(endDate, N, M){
+  const g = groupByDay();
+  const out = [];
+  for (let i = N - 1; i >= 0; i--){
+    const d = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - i);
+    const list = g.get(dayKey(d)) || [];
+    let v = null, a = null;
+    if (M.kind === 'rating'){
+      const rl = list.filter(s => s.mode === 'ranked' && s.ratingAfter != null).sort((x, y) => x.t - y.t);
+      if (rl.length) v = rl[rl.length - 1].ratingAfter;
+    } else {
+      a = list.length ? agg(list) : null;
+      v = a ? M.get(a) : null;
+    }
+    out.push({ d, list, a, v });
+  }
+  return out;
+}
+function lastVal(arr){ for (let i = arr.length - 1; i >= 0; i--) if (arr[i].v != null) return arr[i].v; return null; }
+const meanOf = arr => { const v = arr.filter(x => x.v != null).map(x => x.v); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+
+function niceStep(raw){
+  const p = Math.pow(10, Math.floor(Math.log10(raw)));
+  const f = raw / p;
+  return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p;
+}
+function niceScale(lo, hi, cap){
+  if (hi <= lo) hi = lo + 1;
+  const step = niceStep((hi - lo) / 4);
+  const a = Math.floor(lo / step) * step;
+  let b = Math.ceil(hi / step) * step;
+  if (cap != null && b > cap) b = cap;
+  const ticks = [];
+  for (let v = a; v <= b + 1e-9; v += step) ticks.push(+v.toFixed(6));
+  return { lo: a, hi: Math.max(b, ticks[ticks.length - 1]), ticks };
+}
+
+let CH = null;
+
+function renderCharts(){
+  if (view !== 'charts') return;
+  const N = chartRange, M = METRICS[chartMetric];
+  const today = new Date();
+  const days = dailyVals(today, N, M);
+  const prevEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() - N);
+  const prev = dailyVals(prevEnd, N, M);
+
+  $('#chart').setAttribute('aria-label', `Gráfica diaria de ${M.label.toLowerCase()}. Usa las flechas izquierda y derecha para revisar cada día.`);
+
+  const isRating = M.kind === 'rating';
+  const cur = isRating ? lastVal(days) : meanOf(days);
+  const old = isRating ? lastVal(prev) : meanOf(prev);
+  const big = $('#ch-big'), capEl = $('#ch-caption');
+  const svgBox = $('#chart-svg'), empty = $('#chart-empty'), tip = $('#tip');
+
+  if (cur == null){
+    big.innerHTML = '–';
+    capEl.textContent = isRating ? 'Aún no has jugado en modo ranked.' : 'Sin datos en este periodo.';
+    $('#chart-empty-txt').innerHTML = isRating
+      ? 'No hay partidas ranked en este periodo.<br>Juega contra un bot para ver tu progreso de rango.'
+      : 'No hay sesiones en este periodo.<br>Entrena una para ver tu evolución día a día.';
+    svgBox.innerHTML = '';
+    svgBox.hidden = true; tip.hidden = true; empty.hidden = false;
+    CH = null;
+    return;
+  }
+  svgBox.hidden = false; empty.hidden = true;
+
+  const [bn, bu] = M.big(cur);
+  big.innerHTML = `${bn}<small>${bu}</small>`;
+  let capTxt = M.cap(N) + '.';
+  if (old != null){
+    if (isRating){
+      const diff = Math.round(cur - old);
+      if (diff === 0) capTxt += ` Sin cambios respecto a hace ${N} días.`;
+      else capTxt += ` ${diff > 0 ? '+' : ''}${diff} Elo respecto a hace ${N} días.`;
+    } else if (old > 0){
+      const pct = (cur - old) / old * 100;
+      if (Math.abs(pct) < 0.5) capTxt += ` Sin cambios respecto a los ${N} días anteriores.`;
+      else {
+        const better = (M.better === 'up') === (pct > 0);
+        capTxt += ` ${Math.abs(Math.round(pct))}\u00a0% ${better ? 'mejor' : 'peor'} que los ${N} días anteriores.`;
+      }
+    }
+  }
+  capEl.textContent = capTxt;
+
+  // ---- dimensiones
+  const Wc = Math.max(280, svgBox.clientWidth || 600);
+  const Hc = Wc < 520 ? 250 : 330;
+  const m = { l: 46, r: 12, t: 16, b: 44 };
+  const iw = Wc - m.l - m.r, ih = Hc - m.t - m.b, P = 10;
+  const xAt = i => m.l + P + i * (iw - 2 * P) / (N - 1);
+
+  // ---- dominio
+  const all = days.filter(d => d.v != null).map(d => d.v);
+  if (M.sess) days.forEach(d => d.list.forEach(se => { const v = M.sess(se); if (v != null) all.push(v); }));
+  const mn = Math.min(...all), mx = Math.max(...all);
+  let lo, hi;
+  if (M.zero){ lo = 0; hi = mx * 1.1 || 1; }
+  else if (isRating){
+    const span = Math.max(mx - mn, 40);
+    lo = Math.max(0, mn - span * 0.35);
+    hi = mx + span * 0.35;
+  } else {
+    const span = Math.max(mx - mn, mx * 0.08, 1);
+    lo = Math.max(0, mn - span * 0.6);
+    hi = mx + span * 0.4;
+  }
+  const sc = niceScale(lo, hi, M.cap100 ? 100 : null);
+  const yAt = v => m.t + ih - (v - sc.lo) / (sc.hi - sc.lo) * ih;
+
+  // ---- svg
+  let s = `<svg width="${Wc}" height="${Hc}" viewBox="0 0 ${Wc} ${Hc}" aria-hidden="true" focusable="false">
+    <defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff2ea6" stop-opacity=".28"/><stop offset="1" stop-color="#ff2ea6" stop-opacity="0"/>
+    </linearGradient></defs>`;
+
+  for (const tv of sc.ticks){
+    const y = yAt(tv);
+    s += `<line class="gl" x1="${m.l}" x2="${Wc - m.r}" y1="${y}" y2="${y}"/>`;
+    s += `<text class="ax" x="${m.l - 10}" y="${y + 4}" text-anchor="end">${M.axis(tv)}</text>`;
+  }
+
+  const maxLabels = Math.max(2, Math.floor(iw / 46));
+  const step = Math.ceil(N / maxLabels);
+  let firstLabel = true;
+  days.forEach((dd, i) => {
+    if ((N - 1 - i) % step !== 0) return;
+    const x = xAt(i), dn = dd.d.getDate();
+    const isNow = i === N - 1;
+    s += `<text class="ax${isNow ? ' now' : ''}" x="${x}" y="${m.t + ih + 20}" text-anchor="middle">${dn}</text>`;
+    let l2 = '';
+    if (firstLabel || dn === 1) l2 = fmtMon.format(dd.d).replace('.', '');
+    else if (N <= 14) l2 = fmtWd.format(dd.d).replace('.', '');
+    if (l2) s += `<text class="ax" x="${x}" y="${m.t + ih + 36}" text-anchor="middle">${l2}</text>`;
+    firstLabel = false;
+  });
+
+  // sesiones sueltas
+  if (M.sess){
+    days.forEach((dd, i) => dd.list.forEach(se => {
+      const v = M.sess(se);
+      if (v != null) s += `<circle class="sdot" cx="${xAt(i)}" cy="${yAt(v)}" r="2.6"/>`;
+    }));
+  }
+
+  // tramos continuos (para rating, mantiene el último valor conocido entre partidas)
+  let plotDays = days;
+  if (isRating){
+    plotDays = [];
+    let carry = null;
+    days.forEach(dd => { if (dd.v != null) carry = dd.v; plotDays.push({ ...dd, v: carry }); });
+  }
+  const segs = []; let curSeg = [];
+  plotDays.forEach((dd, i) => {
+    if (dd.v != null) curSeg.push(i);
+    else { if (curSeg.length) segs.push(curSeg); curSeg = []; }
+  });
+  if (curSeg.length) segs.push(curSeg);
+  const base = m.t + ih;
+  for (const sg of segs){
+    if (sg.length < 2) continue;
+    const pts = sg.map(i => `${xAt(i)} ${yAt(plotDays[i].v)}`);
+    s += `<path d="M${pts.join(' L')} L${xAt(sg[sg.length - 1])} ${base} L${xAt(sg[0])} ${base} Z" fill="url(#fill)"/>`;
+    s += `<path class="line" d="M${pts.join(' L')}"/>`;
+  }
+  days.forEach((dd, i) => { if (dd.v != null) s += `<circle class="dot" cx="${xAt(i)}" cy="${yAt(dd.v)}" r="4"/>`; });
+
+  s += `<line class="guide" id="guide" x1="0" x2="0" y1="${m.t}" y2="${base}" style="display:none"/>
+        <circle class="ring" id="ring" cx="0" cy="0" r="8" style="display:none"/></svg>`;
+  svgBox.innerHTML = s;
+
+  CH = { days, xAt, yAt, M, Wc, m, ih, N };
+  if (activeIdx == null || activeIdx >= N){
+    let last = N - 1;
+    for (let i = N - 1; i >= 0; i--){ if (days[i].v != null){ last = i; break; } }
+    activeIdx = last;
+  }
+  setActive(activeIdx, false);
+}
+
+function setActive(i, announce){
+  if (!CH) return;
+  i = Math.max(0, Math.min(CH.N - 1, i));
+  activeIdx = i;
+  const dd = CH.days[i], x = CH.xAt(i);
+  const guide = $('#guide'), ring = $('#ring'), tip = $('#tip');
+  if (!guide) return;
+  guide.setAttribute('x1', x); guide.setAttribute('x2', x); guide.style.display = '';
+  let ty;
+  if (dd.v != null){
+    const y = CH.yAt(dd.v);
+    ring.setAttribute('cx', x); ring.setAttribute('cy', y); ring.style.display = '';
+    ty = y;
+  } else {
+    ring.style.display = 'none';
+    ty = CH.m.t + CH.ih / 2;
+  }
+  const dateTxt = `${fmtWd.format(dd.d).replace('.', '')} ${dd.d.getDate()} ${fmtMon.format(dd.d).replace('.', '')}`;
+  const body = dd.v != null
+    ? `<b>${CH.M.fmt(dd.v)}</b><br><span class="d">${CH.M.kind === 'rating' ? plural(dd.list.filter(x => x.mode === 'ranked').length, 'partida ranked', 'partidas ranked') : plural(dd.list.length, 'sesión', 'sesiones')}</span>`
+    : `<span class="d">${CH.M.kind === 'rating' ? 'Sin partidas ranked' : 'Sin sesiones'}</span>`;
+  tip.innerHTML = `<span class="d">${dateTxt}</span><br>${body}`;
+  tip.hidden = false;
+  const half = tip.offsetWidth / 2 + 4;
+  tip.style.left = Math.min(Math.max(x, half), CH.Wc - half) + 'px';
+  const above = ty - tip.offsetHeight - 14 >= 0;
+  tip.style.top = (above ? ty - 14 : ty + 14) + 'px';
+  tip.style.transform = above ? 'translate(-50%,-100%)' : 'translate(-50%,0)';
+
+  if (announce){
+    $('#chart-sr').textContent = dd.v != null
+      ? `${dateTxt}: ${CH.M.fmt(dd.v)}.`
+      : `${dateTxt}: sin datos.`;
+  }
+}
+
+$('#chart').addEventListener('pointermove', e => {
+  if (!CH) return;
+  const box = $('#chart-svg').getBoundingClientRect();
+  const px = e.clientX - box.left;
+  const P = 10, iw = CH.Wc - CH.m.l - CH.m.r;
+  const stepPx = (iw - 2 * P) / (CH.N - 1);
+  const i = Math.round((px - (CH.m.l + P)) / stepPx);
+  if (i !== activeIdx) setActive(i, false);
+});
+$('#chart').addEventListener('keydown', e => {
+  if (!CH) return;
+  let i = activeIdx;
+  if (e.key === 'ArrowLeft') i--;
+  else if (e.key === 'ArrowRight') i++;
+  else if (e.key === 'Home') i = 0;
+  else if (e.key === 'End') i = CH.N - 1;
+  else return;
+  e.preventDefault();
+  setActive(i, true);
+});
+$('#empty-go').addEventListener('click', () => setView('train'));
+
+let lastChartW = 0;
+new ResizeObserver(() => {
+  const w = $('#chart-svg').clientWidth;
+  if (view === 'charts' && w && Math.abs(w - lastChartW) > 1){ lastChartW = w; renderCharts(); }
+}).observe($('#chart-svg'));
+
+/* =========================================================
+   Chips de configuración
+   ========================================================= */
+function syncChips(){
+  $$('.chip[data-k]').forEach(c => {
+    const k = c.dataset.k;
+    const cur = k === 'mode' ? cfg.mode : k === 'size' ? cfg.size : k === 'dur' ? String(cfg.dur)
+              : k === 'metric' ? chartMetric : String(chartRange);
+    c.setAttribute('aria-pressed', String(c.dataset.v === cur));
+  });
+}
+document.addEventListener('click', e => {
+  const c = e.target.closest('.chip[data-k]');
+  if (!c) return;
+  const k = c.dataset.k, v = c.dataset.v;
+  if (k === 'mode' || k === 'size' || k === 'dur'){
+    cfg[k] = k === 'dur' ? Number(v) : v;
+    save(KEY_C, cfg);
+    if (G.phase === 'done') cancelGame();
+    updateIdleText();
+    updateHud(performance.now());
+    draw(performance.now());
+  } else if (k === 'metric'){
+    chartMetric = v; activeIdx = null; renderCharts();
+  } else {
+    chartRange = Number(v); activeIdx = null; renderCharts();
+  }
+  syncChips();
+});
+
+/* =========================================================
+   Navegación
+   ========================================================= */
+function setView(v){
+  if (v !== 'train') cancelGame();
+  view = v;
+  ['train', 'cal', 'charts'].forEach(n => {
+    $('#view-' + n).hidden = n !== v;
+    const t = $('#tab-' + n);
+    t.setAttribute('aria-selected', String(n === v));
+    t.tabIndex = n === v ? 0 : -1;
+  });
+  if (v === 'train'){ resize(); renderToday(); updateIdleText(); }
+  if (v === 'cal'){ renderCalendar(); renderDetail(); }
+  if (v === 'charts'){ activeIdx = null; renderCharts(); }
+  window.scrollTo(0, 0);
+}
+const tabs = $$('.tab');
+tabs.forEach(t => t.addEventListener('click', () => setView(t.dataset.view)));
+$('.tabs').addEventListener('keydown', e => {
+  const i = tabs.indexOf(document.activeElement);
+  if (i < 0) return;
+  let n = i;
+  if (e.key === 'ArrowRight') n = (i + 1) % tabs.length;
+  else if (e.key === 'ArrowLeft') n = (i - 1 + tabs.length) % tabs.length;
+  else return;
+  e.preventDefault();
+  tabs[n].focus();
+  setView(tabs[n].dataset.view);
+});
+
+/* =========================================================
+   Datos: ejemplo y borrado
+   ========================================================= */
+function refreshAll(){
+  renderProfile();
+  renderToday();
+  updateIdleText();
+  if (view === 'cal'){ renderCalendar(); renderDetail(); }
+  if (view === 'charts'){ activeIdx = null; renderCharts(); }
+}
+
+$('#btn-sample').addEventListener('click', () => {
+  const out = [];
+  const t0 = new Date(); t0.setHours(0, 0, 0, 0);
+  let simRating = 950;
+  for (let i = 29; i >= 0; i--){
+    const day = new Date(t0); day.setDate(day.getDate() - i);
+    if (Math.random() < 0.28 && i !== 0) continue;
+    const trend = (29 - i) / 29;
+    const n = 1 + Math.floor(Math.random() * 3.6);
+    for (let k = 0; k < n; k++){
+      const r = Math.random();
+      const mode = r < 0.4 ? 'ranked' : r < 0.75 ? 'classic' : 'burst';
+      const rs = Math.random();
+      const size = rs < 0.2 ? 's' : rs < 0.85 ? 'm' : 'l';
+      const dur = Math.random() < 0.7 ? 60 : 30;
+      const rt = Math.round(680 - trend * 170 + (Math.random() - 0.5) * 70);
+      const acc = Math.min(99, 79 + trend * 13 + (Math.random() - 0.5) * 7);
+      const hits = Math.max(8, Math.round((44 + trend * 16 + (Math.random() - 0.5) * 6) * dur / 60));
+      const miss = Math.round(hits * (100 / acc - 1));
+      const score = calcScore(hits, rt, miss, size, dur);
+      const hr = 17 + Math.floor(Math.random() * 6);
+      let t = new Date(day.getFullYear(), day.getMonth(), day.getDate(), hr, Math.floor(Math.random() * 60)).getTime();
+      if (i === 0) t = Math.min(t, Date.now() - (n - k) * 60000);
+
+      const sess = { t, d: dayKey(new Date(t)), mode, size, dur, hits, miss, acc: Math.round(hits / (hits + miss) * 1000) / 10, rt, score };
+
+      if (mode === 'ranked'){
+        const oppRating = clamp(simRating + (Math.random() * 160 - 80), 300, 3000);
+        const bot = botStats(oppRating, dur, size);
+        const result = score > bot.score ? 'win' : score < bot.score ? 'loss' : 'draw';
+        const before = simRating;
+        const after = eloUpdate(before, oppRating, result);
+        sess.result = result; sess.botScore = bot.score; sess.oppRating = Math.round(oppRating);
+        sess.ratingBefore = before; sess.ratingAfter = after; sess.delta = after - before;
+        simRating = after;
+      }
+      out.push(sess);
+    }
+  }
+  sessions = sessions.concat(out).sort((a, b) => a.t - b.t);
+  save(KEY_S, sessions);
+  syncProfileFromSessions();
+  refreshAll();
+});
+
+let clearTimer = 0;
+$('#btn-clear').addEventListener('click', e => {
+  const b = e.currentTarget;
+  if (!b.dataset.armed){
+    b.dataset.armed = '1';
+    b.textContent = '¿Seguro? Pulsa de nuevo para borrar';
+    clearTimer = setTimeout(() => { delete b.dataset.armed; b.textContent = 'Borrar historial'; }, 4000);
+    return;
+  }
+  clearTimeout(clearTimer);
+  delete b.dataset.armed;
+  b.textContent = 'Borrar historial';
+  sessions = [];
+  save(KEY_S, sessions);
+  syncProfileFromSessions();
+  refreshAll();
+});
+
+/* =========================================================
+   Exportar / importar datos
+   Formato versionado: cada sesión conserva TODOS sus campos al
+   exportar, incluidos los que una versión futura pueda añadir.
+   Al importar solo se exige t (marca de tiempo) y d (día); el
+   resto de campos que falten se normalizan con valores por
+   defecto seguros, así un archivo de una versión distinta
+   (anterior o posterior) siempre se puede volver a cargar.
+   ========================================================= */
+const EXPORT_VERSION = 1;
+let ioTimer = 0;
+function setIo(msg){
+  const el = $('#io-status');
+  el.textContent = msg;
+  clearTimeout(ioTimer);
+  ioTimer = setTimeout(() => { el.textContent = ''; }, 7000);
+}
+
+function exportData(){
+  const payload = {
+    app: 'mira-aim-trainer',
+    version: EXPORT_VERSION,
+    exportedAt: new Date().toISOString(),
+    sessions,
+    profile
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mira-datos-${dayKey(new Date())}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  setIo(sessions.length
+    ? `Archivo descargado con ${plural(sessions.length, 'sesión', 'sesiones')}. Guárdalo para restaurar tus datos más adelante.`
+    : 'Archivo descargado. Aún no tienes sesiones guardadas.');
+}
+
+function normalizeImported(raw){
+  if (!raw || typeof raw.t !== 'number' || typeof raw.d !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(raw.d)) return null;
+  const s = { ...raw };
+  s.mode = MODES[s.mode] ? s.mode : 'classic';
+  s.size = SIZES[s.size] ? s.size : 'm';
+  s.dur = [30, 60].includes(s.dur) ? s.dur : 60;
+  ['hits', 'miss', 'score', 'rt'].forEach(k => { if (typeof s[k] !== 'number' || !isFinite(s[k])) s[k] = 0; });
+  if (typeof s.acc !== 'number' || !isFinite(s.acc)){
+    s.acc = (s.hits + s.miss) ? Math.round(s.hits / (s.hits + s.miss) * 1000) / 10 : 0;
+  }
+  if (s.mode === 'ranked' && (typeof s.ratingAfter !== 'number' || !['win', 'draw', 'loss'].includes(s.result))){
+    s.mode = 'classic'; // datos ranked incompletos: se conservan como sesión normal
+  }
+  return s;
+}
+
+$('#btn-export').addEventListener('click', exportData);
+$('#btn-import').addEventListener('click', () => $('#import-file').click());
+$('#import-file').addEventListener('change', async e => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const incoming = Array.isArray(data) ? data : Array.isArray(data.sessions) ? data.sessions : null;
+    if (!incoming) throw new Error('formato no reconocido');
+
+    const seen = new Set(sessions.map(s => s.t));
+    let added = 0, skipped = 0;
+    for (const raw of incoming){
+      const s = normalizeImported(raw);
+      if (!s || seen.has(s.t)){ skipped++; continue; }
+      seen.add(s.t);
+      sessions.push(s);
+      added++;
+    }
+    sessions.sort((a, b) => a.t - b.t);
+    save(KEY_S, sessions);
+    syncProfileFromSessions();
+    refreshAll();
+    setIo(added
+      ? `Se importaron ${plural(added, 'sesión', 'sesiones')} nueva${added === 1 ? '' : 's'}${skipped ? ` (${skipped} ya existían o no eran válidas)` : ''}.`
+      : `No se añadió nada nuevo${skipped ? `: ${skipped} sesiones ya existían o no eran válidas` : ''}.`);
+  } catch (err){
+    setIo('No se pudo leer el archivo. Comprueba que sea un backup de Mira válido (.json).');
+  }
+});
+
+/* =========================================================
+   Inicio
+   ========================================================= */
+syncChips();
+updateIdleText();
+updateHud(performance.now());
+renderProfile();
+renderToday();
+resize();
+})();
+</script>
+</body>
+</html>
