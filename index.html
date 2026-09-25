@@ -36,6 +36,7 @@ button{font-family:inherit}
 .sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .wrap{max-width:1040px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
 
+/* ---------- cabecera ---------- */
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:rgb(0 0 0 / .92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line-soft)}
 .top .bar{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;min-height:60px;padding:10px 0}
 .brandrow{display:flex;align-items:center;gap:16px}
@@ -56,6 +57,19 @@ button{font-family:inherit}
 
 .view{padding:clamp(22px,4vw,40px) 0 56px}
 
+/* ---------- controles ---------- */
+
+.settings-toggle{display:flex;position:relative;align-items:center;gap:7px;margin-left:auto}
+.settings-panel{position:absolute;right:clamp(16px,4vw,32px);top:calc(100% + 10px);width:min(390px,calc(100vw - 32px));padding:18px;border:1px solid var(--line);border-radius:14px;background:rgb(8 8 8 / .97);box-shadow:0 18px 45px rgb(0 0 0 / .45);z-index:20}
+.settings-panel[hidden]{display:none}
+.settings-panel h2{margin:0 0 14px;font:500 1rem var(--display);color:var(--text)}
+.settings-panel .group{margin-bottom:16px}
+.theme-swatch{width:28px;height:28px;border-radius:50%;padding:0;display:grid;place-items:center}
+.theme-swatch i{width:12px;height:12px;border-radius:50%;background:currentColor;display:block}
+.rank-icon{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 22px;border-radius:7px;border:1px solid color-mix(in srgb,var(--pink) 55%,transparent);background:color-mix(in srgb,var(--pink) 9%,transparent);box-shadow:0 0 8px color-mix(in srgb,var(--pink) 18%,transparent);vertical-align:middle;margin-right:.25em;color:var(--pink)}.rank-icon svg{width:16px;height:16px;display:block}
+.profile .rk{display:flex;align-items:center}
+.rank-icon.bronce{color:#cd7f32}.rank-icon.plata{color:#c0c0c0}.rank-icon.oro{color:#ffd34d}.rank-icon.platino{color:#8fe3d4}.rank-icon.diamante{color:#7bdcff}.rank-icon.ruby{color:#ff4d6d}
+
 .settings{display:flex;flex-wrap:wrap;gap:12px 30px;margin-bottom:16px;transition:opacity .2s}
 .settings[inert]{opacity:.3}
 .group{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
@@ -75,7 +89,7 @@ button{font-family:inherit}
 .ranked-note{margin:0 0 20px;color:var(--muted);font-size:.88rem}
 .ranked-note b{color:var(--pink);font-weight:600}
 
-
+/* ---------- entrenar ---------- */
 .hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:16px;margin-bottom:16px}
 .hud>div{display:flex;flex-direction:column}
 .num{font:600 clamp(1.7rem,5.4vw,2.9rem)/1.1 var(--display);color:var(--pink);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
@@ -108,6 +122,7 @@ button{font-family:inherit}
 .res-note{margin:18px 0 0;color:var(--muted);font-size:.85rem}
 .today{margin:18px 0 0;color:var(--muted)}
 
+/* ---------- calendario ---------- */
 .cal-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(28px,5vw,60px);align-items:start}
 .cal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
 .cal-title{margin:0;font:500 clamp(1.3rem,3.6vw,1.9rem)/1.1 var(--display);letter-spacing:-.02em;text-transform:capitalize}
@@ -144,7 +159,7 @@ button{font-family:inherit}
 .sess .tag.loss{color:var(--muted)}
 .detail .btn{margin-top:18px}
 
-
+/* ---------- gráficas ---------- */
 .chart-controls{display:flex;flex-wrap:wrap;gap:14px 34px;margin-bottom:28px}
 .chart-summary{margin-bottom:22px}
 .big{font:600 clamp(2.5rem,8vw,4.2rem)/1 var(--display);color:var(--pink);letter-spacing:-.04em;text-shadow:0 0 30px rgb(var(--pink-rgb) / .5)}
@@ -167,6 +182,7 @@ button{font-family:inherit}
 .chart-empty{border:1px dashed var(--line);border-radius:8px;padding:48px 24px;text-align:center;color:var(--muted)}
 .chart-empty .btn{margin-top:16px}
 
+/* ---------- pie ---------- */
 .foot{border-top:1px solid var(--line-soft);padding:20px 0 32px;color:var(--muted);font-size:.85rem}
 .foot .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px}
 .foot p{margin:0}
@@ -206,19 +222,41 @@ button{font-family:inherit}
         <button class="tab" role="tab" id="tab-charts" data-view="charts" aria-selected="false" aria-controls="view-charts" tabindex="-1">Gráficas</button>
       </nav>
     </div>
+    <div class="settings-toggle">
+      <button class="icon-btn" id="open-settings" type="button" aria-label="Abrir personalización" aria-expanded="false" title="Personalización">⚙</button>
+    </div>
     <div class="profile" id="profile-chip">
       <span class="lvl" id="p-lvl">Nv. 1</span>
       <span class="who">
-        <span class="rk" id="p-rank">Bronce · <b>1000</b></span>
+        <span class="rk" id="p-rank"><span class="rank-icon bronce">B</span>Bronce · <b>1000</b></span>
         <span class="xpbar"><i id="p-xpbar"></i></span>
       </span>
     </div>
   </div>
+<div class="settings-panel" id="settings-panel" hidden>
+  <h2>Personalización</h2>
+  <div class="group" role="group" aria-labelledby="l-theme">
+    <span class="group-label" id="l-theme">Tema</span>
+    <button class="chip" data-k="theme" data-v="pink"><span class="theme-swatch"><i></i></span> Rosa</button>
+    <button class="chip" data-k="theme" data-v="cyan"><span class="theme-swatch"><i></i></span> Cian</button>
+    <button class="chip" data-k="theme" data-v="purple"><span class="theme-swatch"><i></i></span> Morado</button>
+    <button class="chip" data-k="theme" data-v="lime"><span class="theme-swatch"><i></i></span> Lima</button>
+    <button class="chip" data-k="theme" data-v="amber"><span class="theme-swatch"><i></i></span> Ámbar</button>
+  </div>
+  <div class="group" role="group" aria-labelledby="l-cursor">
+    <span class="group-label" id="l-cursor">Puntero</span>
+    <button class="chip" data-k="cursor" data-v="crosshair">✣ Preciso</button>
+    <button class="chip" data-k="cursor" data-v="dot">● Punto</button>
+    <button class="chip" data-k="cursor" data-v="ring">◎ Anillo</button>
+    <button class="chip" data-k="cursor" data-v="plus">＋ Cruz</button>
+  </div>
+</div>
+
 </header>
 
 <main class="wrap">
 
-
+  <!-- ENTRENAR -->
   <section class="view" id="view-train" role="tabpanel" aria-labelledby="tab-train">
     <div class="settings" id="settings">
       <div class="group" role="group" aria-labelledby="l-mode">
@@ -261,6 +299,7 @@ button{font-family:inherit}
     <p class="today" id="today"></p>
   </section>
 
+  <!-- CALENDARIO -->
   <section class="view" id="view-cal" role="tabpanel" aria-labelledby="tab-cal" hidden>
     <div class="cal-layout">
       <div>
@@ -288,7 +327,7 @@ button{font-family:inherit}
     </div>
   </section>
 
-
+  <!-- GRÁFICAS -->
   <section class="view" id="view-charts" role="tabpanel" aria-labelledby="tab-charts" hidden>
     <div class="chart-controls">
       <div class="group" role="group" aria-labelledby="l-metric">
@@ -346,6 +385,9 @@ button{font-family:inherit}
 const $  = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
+/* =========================================================
+   Almacenamiento (localStorage con respaldo en memoria)
+   ========================================================= */
 const KEY_S = 'mira.sessions.v1';
 const KEY_C = 'mira.config.v1';
 const KEY_P = 'mira.profile.v1';
@@ -362,6 +404,9 @@ function save(key, val){
   try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
 }
 
+/* =========================================================
+   Estado
+   ========================================================= */
 let sessions = load(KEY_S, []);
 if (!Array.isArray(sessions)) sessions = [];
 sessions = sessions.filter(s => s && typeof s.t === 'number' && typeof s.d === 'string');
@@ -370,7 +415,9 @@ const cfgSaved = load(KEY_C, {});
 const cfg = {
   mode: ['classic', 'burst', 'ranked'].includes(cfgSaved.mode) ? cfgSaved.mode : 'classic',
   size: ['s', 'm', 'l'].includes(cfgSaved.size) ? cfgSaved.size : 'm',
-  dur:  [30, 60].includes(cfgSaved.dur) ? cfgSaved.dur : 30
+  dur:  [30, 60].includes(cfgSaved.dur) ? cfgSaved.dur : 30,
+  theme: ['pink','cyan','purple','lime','amber'].includes(cfgSaved.theme) ? cfgSaved.theme : 'pink',
+  cursor: ['crosshair','dot','ring','plus'].includes(cfgSaved.cursor) ? cfgSaved.cursor : 'crosshair'
 };
 
 const profSaved = load(KEY_P, {});
@@ -391,7 +438,10 @@ let calMonth = new Date(); calMonth = new Date(calMonth.getFullYear(), calMonth.
 const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 const COARSE = window.matchMedia && matchMedia('(pointer: coarse)').matches;
 
-const PINK = '#ff2ea6';
+/* =========================================================
+   Utilidades
+   ========================================================= */
+let PINK = '#ff2ea6';
 const MODES = { classic: 'Clásico', burst: 'Ráfaga', ranked: 'Ranked' };
 const SIZE_NAMES = { s: 'pequeño', m: 'medio', l: 'grande' };
 const SIZES = {
@@ -445,28 +495,33 @@ function calcScore(hits, rt, miss, size, dur){
   return Math.max(0, Math.round(raw * 60 / dur));
 }
 
-function xpForLevel(lvl){ return Math.round(70 * Math.pow(lvl, 1.42) + 30 * lvl); }
+/* =========================================================
+   Niveles y XP
+   ========================================================= */
+function xpForLevel(lvl){ return Math.round(48 * Math.pow(lvl, 1.28) + 18 * lvl); }
 function levelFromXp(xp){
   let lvl = 1, need = xpForLevel(1), rem = Math.max(0, xp);
   while (rem >= need){ rem -= need; lvl++; need = xpForLevel(lvl); }
   return { level: lvl, into: rem, need };
 }
 function xpGain(s){
-  let base = Math.round(s.score / 12) + Math.round(s.hits * 0.6);
+  let base = Math.round(s.score / 9) + Math.round(s.hits * 0.85);
   if (s.mode === 'ranked'){
     base += s.result === 'win' ? 45 : s.result === 'draw' ? 22 : 12;
   }
   return Math.max(6, base);
 }
 
-
+/* =========================================================
+   Ranked: rangos y bots
+   ========================================================= */
 const TIERS = [
   { min: 0,    name: 'Bronce' },
   { min: 1000, name: 'Plata' },
-  { min: 1200, name: 'Oro' },
-  { min: 1400, name: 'Platino' },
-  { min: 1600, name: 'Diamante' },
-  { min: 1800, name: 'Mira' }
+  { min: 1150, name: 'Oro' },
+  { min: 1300, name: 'Platino' },
+  { min: 1450, name: 'Diamante' },
+  { min: 1600, name: 'Ruby' }
 ];
 function tierFor(rating){
   let t = TIERS[0];
@@ -483,13 +538,16 @@ function botStats(rating, dur, size){
   return { hits, miss, acc: Math.round(acc * 10) / 10, rt, score: calcScore(hits, rt, miss, size, dur) };
 }
 function eloUpdate(rating, oppRating, result){
-  const K = 32;
+  const K = 48;
   const expected = 1 / (1 + Math.pow(10, (oppRating - rating) / 400));
   const r = result === 'win' ? 1 : result === 'draw' ? 0.5 : 0;
   return Math.max(0, Math.round(rating + K * (r - expected)));
 }
 
-
+/* El perfil (nivel, XP, rango) se recalcula siempre a partir del historial
+   de sesiones en lugar de guardarse "a mano". Así, cargar datos de ejemplo,
+   importar un archivo o borrar el historial dejan el perfil consistente
+   automáticamente, sin lógica duplicada. */
 function syncProfileFromSessions(){
   const sorted = sessions.slice().sort((a, b) => a.t - b.t);
   let xp = 0, wins = 0, losses = 0, draws = 0, rating = 1000;
@@ -510,15 +568,63 @@ function syncProfileFromSessions(){
 /* =========================================================
    Cabecera de perfil
    ========================================================= */
+const THEMES = {
+  pink:{pink:'#ff2ea6',rgb:'255 46 166',text:'#ffe6f4',muted:'#b98aa6',line:'rgb(255 46 166 / .30)',soft:'rgb(255 46 166 / .14)'},
+  cyan:{pink:'#29d9ff',rgb:'41 217 255',text:'#e6fbff',muted:'#86b7c2',line:'rgb(41 217 255 / .30)',soft:'rgb(41 217 255 / .14)'},
+  purple:{pink:'#a66cff',rgb:'166 108 255',text:'#f1eaff',muted:'#a995c7',line:'rgb(166 108 255 / .30)',soft:'rgb(166 108 255 / .14)'},
+  lime:{pink:'#b7f34a',rgb:'183 243 74',text:'#f3ffe3',muted:'#a8b58d',line:'rgb(183 243 74 / .30)',soft:'rgb(183 243 74 / .14)'},
+  amber:{pink:'#ffb52e',rgb:'255 181 46',text:'#fff4dd',muted:'#c2a77a',line:'rgb(255 181 46 / .30)',soft:'rgb(255 181 46 / .14)'}
+};
+const CURSORS = {
+  crosshair: 'crosshair',
+  plus: 'crosshair'
+};
+function makeCursor(type, color){
+  const enc = encodeURIComponent(
+    type === 'ring'
+      ? `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="7" fill="none" stroke="${color}" stroke-width="2"/></svg>`
+      : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><circle cx="12" cy="12" r="4" fill="${color}"/></svg>`
+  ).replace(/'/g, "%27").replace(/\(/g, "%28").replace(/\)/g, "%29");
+  return `url("data:image/svg+xml,${enc}") ${type === 'ring' ? '14 14' : '12 12'}, crosshair`;
+}
+function applyAppearance(){
+  const t=THEMES[cfg.theme]||THEMES.pink, root=document.documentElement;
+  root.style.setProperty('--pink',t.pink); root.style.setProperty('--pink-rgb',t.rgb);
+  root.style.setProperty('--text',t.text); root.style.setProperty('--muted',t.muted);
+  root.style.setProperty('--line',t.line); root.style.setProperty('--line-soft',t.soft);
+  const cursor = cfg.cursor === 'dot' || cfg.cursor === 'ring'
+    ? makeCursor(cfg.cursor, t.pink)
+    : CURSORS[cfg.cursor] || CURSORS.crosshair;
+  root.style.setProperty('--cursor', cursor);
+  PINK=t.pink;
+  document.querySelectorAll('.theme-swatch').forEach(el=>{
+    const b=el.closest('.chip'); el.style.color=THEMES[b?.dataset.v]?.pink||t.pink;
+  });
+}
+function tierIcon(name){
+  const icons={
+    Bronce:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5 50 15v18c0 13-8 22-18 26C22 55 14 46 14 33V15L32 5Z" fill="currentColor" opacity=".18"/><path d="M32 8 47 17v16c0 11-6.5 19-15 23-8.5-4-15-12-15-23V17L32 8Z" fill="none" stroke="currentColor" stroke-width="4"/><path d="m32 18 3.2 8.2 8.8.7-6.7 5.7 2.1 8.5L32 36.5l-7.4 4.6 2.1-8.5-6.7-5.7 8.8-.7L32 18Z" fill="currentColor"/></svg>',
+    Plata:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="m32 6 8 17 18 2-13.5 12 4 18L32 45l-16.5 10 4-18L6 25l18-2 8-17Z" fill="currentColor" opacity=".2"/><path d="m32 7 7.6 16.1 17.4 2-12.8 11.2 3.7 17.1L32 44l-15.9 9.4 3.7-17.1L7 25.1l17.4-2L32 7Z" fill="none" stroke="currentColor" stroke-width="4"/></svg>',
+    Oro:'<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24" fill="currentColor" opacity=".18"/><path d="M20 25h24l-2 25H22l-2-25Z" fill="none" stroke="currentColor" stroke-width="4"/><path d="M17 20h30M22 14h20" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M26 31h12M26 38h12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
+    Platino:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 55 17v30L32 60 9 47V17L32 4Z" fill="currentColor" opacity=".16"/><path d="M32 7 52 18v28L32 57 12 46V18L32 7Z" fill="none" stroke="currentColor" stroke-width="4"/><path d="m32 16 11 16-11 16-11-16 11-16Z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M32 16v32M21 32h22" stroke="currentColor" stroke-width="2"/></svg>',
+    Diamante:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="m32 5 13 9 12 17-25 28L7 31l12-17 13-9Z" fill="currentColor" opacity=".18"/><path d="m32 6 13 9 11 16-24 27L8 31l11-16 13-9Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="m19 15 13 16 13-16M8 31h48M32 31l-8 27M32 31l8 27" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+    Ruby:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="m32 5 18 7 8 17-26 30L6 29l8-17 18-7Z" fill="currentColor" opacity=".2"/><path d="m32 6 17 7 7 16-24 29L8 29l7-16 17-7Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="m15 13 17 16 17-16M8 29h48M32 29l-8 29M32 29l8 29" fill="none" stroke="currentColor" stroke-width="2"/></svg>'
+  };
+  return icons[name] || icons.Bronce;
+}
+function tierClass(name){return (name||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+
 function renderProfile(){
   const { level, into, need } = levelFromXp(profile.xp);
   const tier = tierFor(profile.rating);
   $('#p-lvl').textContent = `Nv. ${level}`;
-  $('#p-rank').innerHTML = `${tier.name} · <b>${nf(profile.rating)}</b>`;
+  $('#p-rank').innerHTML = `<span class="rank-icon ${tierClass(tier.name)}">${tierIcon(tier.name)}</span>${tier.name} · <b>${nf(profile.rating)}</b>`;
   $('#p-xpbar').style.width = Math.round(into / need * 100) + '%';
 }
 
-
+/* =========================================================
+   Juego
+   ========================================================= */
 const canvas = $('#arena');
 const ctx = canvas.getContext('2d');
 const ovIdle = $('#ov-idle');
@@ -750,7 +856,7 @@ function showResults(s, saved, gained, levelAfter, leveledUp, ranked){
         <span class="mid">vs</span>
         <span class="side"><span>Bot</span><span>${nf(ranked.bot.score)}</span></span>
       </div>
-      <p class="res-xp">${sign}${ranked.delta}\u00a0Elo · ahora <b>${nf(ranked.after)}</b> (${tier.name})</p>`;
+      <p class="res-xp">${sign}${ranked.delta}\u00a0Elo · ahora <b>${nf(ranked.after)}</b> (<span class="rank-icon ${tierClass(tier.name)}">${tierIcon(tier.name)}</span>${tier.name})</p>`;
   }
 
   ovRes.innerHTML = `
@@ -848,6 +954,9 @@ function renderToday(){
   $('#today').textContent = txt;
 }
 
+/* =========================================================
+   Calendario
+   ========================================================= */
 let selDay = dayKey(new Date());
 
 function renderCalendar(){
@@ -932,7 +1041,9 @@ $('#cal-today').addEventListener('click', () => {
   renderCalendar(); renderDetail();
 });
 
-
+/* =========================================================
+   Gráficas diarias
+   ========================================================= */
 const METRICS = {
   score: {
     label: 'Puntos', get: a => a.score, sess: s => s.score, zero: true, better: 'up',
@@ -1100,7 +1211,7 @@ function renderCharts(){
     firstLabel = false;
   });
 
- 
+  // sesiones sueltas
   if (M.sess){
     days.forEach((dd, i) => dd.list.forEach(se => {
       const v = M.sess(se);
@@ -1108,7 +1219,7 @@ function renderCharts(){
     }));
   }
 
-
+  // tramos continuos (para rating, mantiene el último valor conocido entre partidas)
   let plotDays = days;
   if (isRating){
     plotDays = [];
@@ -1207,7 +1318,9 @@ new ResizeObserver(() => {
   if (view === 'charts' && w && Math.abs(w - lastChartW) > 1){ lastChartW = w; renderCharts(); }
 }).observe($('#chart-svg'));
 
-
+/* =========================================================
+   Chips de configuración
+   ========================================================= */
 function syncChips(){
   $$('.chip[data-k]').forEach(c => {
     const k = c.dataset.k;
@@ -1220,9 +1333,10 @@ document.addEventListener('click', e => {
   const c = e.target.closest('.chip[data-k]');
   if (!c) return;
   const k = c.dataset.k, v = c.dataset.v;
-  if (k === 'mode' || k === 'size' || k === 'dur'){
+  if (k === 'mode' || k === 'size' || k === 'dur' || k === 'theme' || k === 'cursor'){
     cfg[k] = k === 'dur' ? Number(v) : v;
     save(KEY_C, cfg);
+    if (k === 'theme' || k === 'cursor') applyAppearance();
     if (G.phase === 'done') cancelGame();
     updateIdleText();
     updateHud(performance.now());
@@ -1235,7 +1349,9 @@ document.addEventListener('click', e => {
   syncChips();
 });
 
-
+/* =========================================================
+   Navegación
+   ========================================================= */
 function setView(v){
   if (v !== 'train') cancelGame();
   view = v;
@@ -1264,7 +1380,9 @@ $('.tabs').addEventListener('keydown', e => {
   setView(tabs[n].dataset.view);
 });
 
-
+/* =========================================================
+   Datos: ejemplo y borrado
+   ========================================================= */
 function refreshAll(){
   renderProfile();
   renderToday();
@@ -1336,7 +1454,15 @@ $('#btn-clear').addEventListener('click', e => {
   refreshAll();
 });
 
-
+/* =========================================================
+   Exportar / importar datos
+   Formato versionado: cada sesión conserva TODOS sus campos al
+   exportar, incluidos los que una versión futura pueda añadir.
+   Al importar solo se exige t (marca de tiempo) y d (día); el
+   resto de campos que falten se normalizan con valores por
+   defecto seguros, así un archivo de una versión distinta
+   (anterior o posterior) siempre se puede volver a cargar.
+   ========================================================= */
 const EXPORT_VERSION = 1;
 let ioTimer = 0;
 function setIo(msg){
@@ -1417,6 +1543,15 @@ $('#import-file').addEventListener('change', async e => {
   }
 });
 
+const settingsPanel=$('#settings-panel'),settingsBtn=$('#open-settings');
+settingsBtn.addEventListener('click',()=>{const open=settingsPanel.hidden;settingsPanel.hidden=!open;settingsBtn.setAttribute('aria-expanded',String(open));if(open)syncChips();});
+document.addEventListener('pointerdown',e=>{if(!settingsPanel.hidden&&!settingsPanel.contains(e.target)&&!settingsBtn.contains(e.target)){settingsPanel.hidden=true;settingsBtn.setAttribute('aria-expanded','false');}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!settingsPanel.hidden){settingsPanel.hidden=true;settingsBtn.setAttribute('aria-expanded','false');settingsBtn.focus();}});
+
+/* =========================================================
+   Inicio
+   ========================================================= */
+applyAppearance();
 syncChips();
 updateIdleText();
 updateHud(performance.now());
@@ -1427,6 +1562,7 @@ resize();
 </script>
 </body>
 </html>
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QG8EVKJYZT"></script>
