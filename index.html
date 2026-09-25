@@ -47,13 +47,13 @@ button{font-family:inherit}
 .tab[aria-selected="true"]{color:var(--pink);border-bottom-color:var(--pink)}
 .tab:focus-visible{outline:2px solid var(--text);outline-offset:4px;border-radius:4px}
 
-.profile{display:flex;align-items:center;gap:10px;padding:5px 6px 5px 14px;border:1px solid var(--line);border-radius:999px}
+.profile{min-width:0;display:flex;align-items:center;gap:10px;padding:5px 6px 5px 14px;border:1px solid var(--line);border-radius:999px}
 .profile .lvl{font:600 .82rem var(--display);color:#000;background:var(--pink);border-radius:999px;padding:4px 10px;letter-spacing:-.01em;white-space:nowrap}
 .profile .who{display:flex;flex-direction:column;gap:2px;min-width:74px}
 .profile .rk{font-size:.78rem;color:var(--text);white-space:nowrap}
 .profile .rk b{color:var(--pink)}
-.profile .xpbar{width:100%;height:3px;border-radius:2px;background:var(--line-soft);overflow:hidden}
-.profile .xpbar>i{display:block;height:100%;width:0%;background:var(--pink);border-radius:2px;transition:width .5s ease}
+.profile .xpbar{width:min(150px,100%);height:5px;border-radius:999px;background:var(--line-soft);overflow:hidden;display:block;margin-top:5px;box-shadow:inset 0 0 0 1px rgb(255 255 255 / .04)}
+.profile .xpbar>i{display:block;height:100%;width:0%;background:var(--pink);border-radius:999px;transition:width .35s ease;box-shadow:0 0 8px rgb(var(--pink-rgb) / .35)}
 
 .view{padding:clamp(22px,4vw,40px) 0 56px}
 
@@ -68,13 +68,13 @@ button{font-family:inherit}
 .theme-swatch i{width:12px;height:12px;border-radius:50%;background:currentColor;display:block}
 .rank-icon{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 22px;border-radius:7px;border:1px solid color-mix(in srgb,var(--pink) 55%,transparent);background:color-mix(in srgb,var(--pink) 9%,transparent);box-shadow:0 0 8px color-mix(in srgb,var(--pink) 18%,transparent);vertical-align:middle;margin-right:.25em;color:var(--pink)}.rank-icon svg{width:16px;height:16px;display:block}
 .profile .rk{display:flex;align-items:center}
-.rank-icon.bronce{color:#cd7f32}.rank-icon.plata{color:#c0c0c0}.rank-icon.oro{color:#ffd34d}.rank-icon.platino{color:#8fe3d4}.rank-icon.diamante{color:#7bdcff}.rank-icon.ruby{color:#ff4d6d}
+.rank-icon.bronce{color:#cd7f32}.rank-icon.plata{color:#c0c0c0}.rank-icon.oro{color:#ffd34d}.rank-icon.platino{color:#8fe3d4}.rank-icon.diamante{color:#7bdcff}.rank-icon.esmeralda{color:#35d07f}.rank-icon.ruby{color:#ff4d6d}
 
-.settings{display:flex;flex-wrap:wrap;gap:12px 30px;margin-bottom:16px;transition:opacity .2s}
+.settings{display:flex;flex-wrap:wrap;gap:12px 24px;margin-bottom:18px;transition:opacity .2s;position:relative;z-index:2}
 .settings[inert]{opacity:.3}
 .group{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
 .group-label{color:var(--muted);font-size:.9rem;margin-right:2px}
-.chip{font:500 .9rem var(--body);color:var(--pink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 15px;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.chip{font:500 .9rem var(--body);color:var(--pink);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:7px 15px;cursor:pointer;transition:background .15s,color .15s,border-color .15s;white-space:nowrap;position:relative;z-index:3}
 .chip:hover{border-color:var(--pink)}
 .chip[aria-pressed="true"]{background:var(--pink);border-color:var(--pink);color:#000}
 .btn{font:600 .95rem var(--body);border-radius:999px;padding:11px 24px;border:1px solid var(--pink);background:transparent;color:var(--pink);cursor:pointer;transition:background .15s}
@@ -87,6 +87,8 @@ button{font-family:inherit}
 .icon-btn:disabled{opacity:.25;cursor:default}
 
 .ranked-note{margin:0 0 20px;color:var(--muted);font-size:.88rem}
+.ranked-ladder{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin:0 0 20px;width:100%}.rank-step{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border:1px solid color-mix(in srgb,var(--pink) 25%,transparent);border-radius:8px;color:var(--muted);font-size:.72rem;background:color-mix(in srgb,var(--pink) 5%,transparent)}.rank-step.active{color:var(--pink);border-color:color-mix(in srgb,var(--pink) 65%,transparent);background:color-mix(in srgb,var(--pink) 10%,transparent)}.rank-step .rank-icon{width:18px;height:18px;flex-basis:18px;margin-right:0;border-radius:5px}.rank-step .rank-icon svg{width:13px;height:13px}.rank-step{justify-content:center;min-width:0}.rank-step .rank-label{overflow:hidden;text-overflow:ellipsis}@media(max-width:700px){.ranked-ladder{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:430px){.ranked-ladder{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 .ranked-note b{color:var(--pink);font-weight:600}
 
 /* ---------- entrenar ---------- */
@@ -197,7 +199,7 @@ button{font-family:inherit}
 }
 @media (max-width:640px){
   .top .bar{justify-content:flex-start}
-  .profile{order:3;width:100%}
+  .profile{min-width:0;order:3;width:100%}
   .profile .who{min-width:0;flex:1}
 }
 @media (max-width:420px){
@@ -228,7 +230,7 @@ button{font-family:inherit}
     <div class="profile" id="profile-chip">
       <span class="lvl" id="p-lvl">Nv. 1</span>
       <span class="who">
-        <span class="rk" id="p-rank"><span class="rank-icon bronce">B</span>Bronce · <b>1000</b></span>
+        <span class="rk" id="p-rank"><span class="rank-icon bronce">B</span>Bronce · <b>0</b></span>
         <span class="xpbar"><i id="p-xpbar"></i></span>
       </span>
     </div>
@@ -279,6 +281,7 @@ button{font-family:inherit}
     </div>
 
     <p class="ranked-note" id="ranked-note" hidden></p>
+    <div class="ranked-ladder" id="ranked-ladder" hidden></div>
 
     <div class="hud">
       <div><span class="num" id="h-score">0</span><span class="cap">puntos</span></div>
@@ -521,12 +524,24 @@ const TIERS = [
   { min: 1150, name: 'Oro' },
   { min: 1300, name: 'Platino' },
   { min: 1450, name: 'Diamante' },
-  { min: 1600, name: 'Ruby' }
+  { min: 1600, name: 'Esmeralda' },
+  { min: 1750, name: 'Ruby' }
 ];
 function tierFor(rating){
   let t = TIERS[0];
   for (const x of TIERS) if (rating >= x.min) t = x;
   return t;
+}
+function renderRankLadder(rating){
+  const el = $('#ranked-ladder');
+  if (!el) return;
+  const current = tierFor(rating);
+  el.innerHTML = TIERS.map((tier, i) => {
+    const next = TIERS[i + 1];
+    const active = tier.name === current.name;
+    const range = next ? `${nf(tier.min)}–${nf(next.min - 1)}` : `${nf(tier.min)}+`;
+    return `<span class="rank-step${active ? ' active' : ''}" title="${tier.name}: ${range} puntos"><span class="rank-icon ${tierClass(tier.name)}">${tierIcon(tier.name)}</span><span class="rank-label">${tier.name}</span></span>`;
+  }).join('');
 }
 function botStats(rating, dur, size){
   const t = clamp((rating - 700) / 1300, 0, 1);
@@ -608,6 +623,7 @@ function tierIcon(name){
     Oro:'<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24" fill="currentColor" opacity=".18"/><path d="M20 25h24l-2 25H22l-2-25Z" fill="none" stroke="currentColor" stroke-width="4"/><path d="M17 20h30M22 14h20" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M26 31h12M26 38h12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
     Platino:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 55 17v30L32 60 9 47V17L32 4Z" fill="currentColor" opacity=".16"/><path d="M32 7 52 18v28L32 57 12 46V18L32 7Z" fill="none" stroke="currentColor" stroke-width="4"/><path d="m32 16 11 16-11 16-11-16 11-16Z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M32 16v32M21 32h22" stroke="currentColor" stroke-width="2"/></svg>',
     Diamante:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="m32 5 13 9 12 17-25 28L7 31l12-17 13-9Z" fill="currentColor" opacity=".18"/><path d="m32 6 13 9 11 16-24 27L8 31l11-16 13-9Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="m19 15 13 16 13-16M8 31h48M32 31l-8 27M32 31l8 27" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+    Esmeralda:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="m32 4 24 14v28L32 60 8 46V18L32 4Z" fill="currentColor" opacity=".18"/><path d="M32 7 52 19v26L32 57 12 45V19L32 7Z" fill="none" stroke="currentColor" stroke-width="4"/><path d="m32 15 10 17-10 17-10-17 10-17Z" fill="none" stroke="currentColor" stroke-width="3"/></svg>',
     Ruby:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="m32 5 18 7 8 17-26 30L6 29l8-17 18-7Z" fill="currentColor" opacity=".2"/><path d="m32 6 17 7 7 16-24 29L8 29l7-16 17-7Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="m15 13 17 16 17-16M8 29h48M32 29l-8 29M32 29l8 29" fill="none" stroke="currentColor" stroke-width="2"/></svg>'
   };
   return icons[name] || icons.Bronce;
@@ -619,7 +635,7 @@ function renderProfile(){
   const tier = tierFor(profile.rating);
   $('#p-lvl').textContent = `Nv. ${level}`;
   $('#p-rank').innerHTML = `<span class="rank-icon ${tierClass(tier.name)}">${tierIcon(tier.name)}</span>${tier.name} · <b>${nf(profile.rating)}</b>`;
-  $('#p-xpbar').style.width = Math.round(into / need * 100) + '%';
+  $('#p-xpbar').style.width = Math.max(0, Math.min(100, Math.round(into / need * 100))) + '%';
 }
 
 /* =========================================================
@@ -935,7 +951,9 @@ function updateIdleText(){
     const tier = tierFor(profile.rating);
     $('#idle-sub').textContent = `Ranked, contra un bot a tu nivel, tamaño ${SIZE_NAMES[cfg.size]}, ${cfg.dur} s`;
     $('#ranked-note').hidden = false;
+    $('#ranked-ladder').hidden = false;
     $('#ranked-note').innerHTML = `Tu rango actual es <b>${tier.name}</b> con <b>${nf(profile.rating)}</b> puntos. El bot se ajusta a tu nivel.`;
+    renderRankLadder(profile.rating);
   } else {
     $('#idle-sub').textContent = `${MODES[cfg.mode]}, tamaño ${SIZE_NAMES[cfg.size]}, ${cfg.dur} s`;
     $('#ranked-note').hidden = true;
@@ -1562,6 +1580,7 @@ resize();
 </script>
 </body>
 </html>
+
 
 
 <!-- Google tag (gtag.js) -->
