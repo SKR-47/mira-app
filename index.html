@@ -60,6 +60,26 @@ button{font-family:inherit}
 /* ---------- controles ---------- */
 
 .settings-toggle{display:flex;position:relative;align-items:center;gap:7px;margin-left:auto}
+
+.social-toggle{display:flex;align-items:center}
+.social-panel{position:absolute;right:clamp(16px,4vw,32px);top:calc(100% + 10px);width:min(430px,calc(100vw - 32px));padding:20px;border:1px solid var(--line);border-radius:16px;background:rgb(8 8 8 / .98);box-shadow:0 18px 45px rgb(0 0 0 / .5);z-index:25}
+.social-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.social-kicker{font-size:.7rem;letter-spacing:.14em;color:var(--muted)}
+.social-head h2{margin:3px 0 2px;font:500 1.05rem var(--display)}
+#cloud-status{margin:0;color:var(--muted);font-size:.8rem}
+.social-account{display:grid;gap:10px;margin:18px 0;padding-bottom:16px;border-bottom:1px solid var(--line-soft)}
+.social-account label{display:grid;gap:5px;color:var(--muted);font-size:.78rem}
+.social-account input,.friend-add input{width:100%;border:1px solid var(--line);border-radius:9px;background:#050505;color:var(--text);padding:9px 10px;font:inherit}
+.friends-head{display:flex;align-items:center;justify-content:space-between}
+.friends-head h3{margin:0;font:500 .95rem var(--display)}
+#friend-count{font-size:.75rem;color:var(--muted)}
+.friend-add{display:flex;gap:8px;margin:10px 0}
+.friend-add .btn{padding:8px 13px}
+#friend-list{list-style:none;padding:0;margin:0;display:grid;gap:6px;max-height:170px;overflow:auto}
+#friend-list li{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border:1px solid var(--line-soft);border-radius:9px;color:var(--text);font-size:.85rem}
+.friend-remove{border:0;background:transparent;color:var(--muted);cursor:pointer}
+.cloud-note{margin:14px 0 0;color:var(--muted);font-size:.76rem;line-height:1.45}
+@media(max-width:700px){.social-panel{right:16px}}
 .settings-panel{position:absolute;right:clamp(16px,4vw,32px);top:calc(100% + 10px);width:min(390px,calc(100vw - 32px));padding:18px;border:1px solid var(--line);border-radius:14px;background:rgb(8 8 8 / .97);box-shadow:0 18px 45px rgb(0 0 0 / .45);z-index:20}
 .settings-panel[hidden]{display:none}
 .settings-panel h2{margin:0 0 14px;font:500 1rem var(--display);color:var(--text)}
@@ -227,6 +247,9 @@ button{font-family:inherit}
     <div class="settings-toggle">
       <button class="icon-btn" id="open-settings" type="button" aria-label="Abrir personalización" aria-expanded="false" title="Personalización">⚙</button>
     </div>
+    <div class="social-toggle">
+      <button class="icon-btn" id="open-social" type="button" aria-label="Abrir cuenta y amigos" aria-expanded="false" title="Cuenta y amigos">♙</button>
+    </div>
     <div class="profile" id="profile-chip">
       <span class="lvl" id="p-lvl">Nv. 1</span>
       <span class="who">
@@ -369,13 +392,9 @@ button{font-family:inherit}
 
 <footer class="foot">
   <div class="wrap">
-    <p>Tus sesiones se guardan solo en este navegador.</p>
+    <p>Cuenta y amigos: sincronización en la nube preparada. Las partidas se guardan localmente hasta conectar el backend.</p>
     <div class="links">
-      <button class="linkbtn" id="btn-export" type="button">Exportar datos</button>
-      <button class="linkbtn" id="btn-import" type="button">Importar datos</button>
-      <button class="linkbtn" id="btn-sample" type="button">Cargar datos de ejemplo</button>
       <button class="linkbtn" id="btn-clear" type="button">Borrar historial</button>
-      <input type="file" id="import-file" accept="application/json,.json" hidden>
       <p class="io-status" id="io-status" aria-live="polite"></p>
     </div>
   </div>
@@ -520,12 +539,12 @@ function xpGain(s){
    ========================================================= */
 const TIERS = [
   { min: 0,    name: 'Bronce' },
-  { min: 1000, name: 'Plata' },
-  { min: 1150, name: 'Oro' },
-  { min: 1300, name: 'Platino' },
-  { min: 1450, name: 'Diamante' },
-  { min: 1600, name: 'Esmeralda' },
-  { min: 1750, name: 'Ruby' }
+  { min: 1200, name: 'Plata' },
+  { min: 1500, name: 'Oro' },
+  { min: 1850, name: 'Platino' },
+  { min: 2250, name: 'Diamante' },
+  { min: 2700, name: 'Esmeralda' },
+  { min: 3200, name: 'Ruby' }
 ];
 function tierFor(rating){
   let t = TIERS[0];
@@ -1409,51 +1428,6 @@ function refreshAll(){
   if (view === 'charts'){ activeIdx = null; renderCharts(); }
 }
 
-$('#btn-sample').addEventListener('click', () => {
-  const out = [];
-  const t0 = new Date(); t0.setHours(0, 0, 0, 0);
-  let simRating = 950;
-  for (let i = 29; i >= 0; i--){
-    const day = new Date(t0); day.setDate(day.getDate() - i);
-    if (Math.random() < 0.28 && i !== 0) continue;
-    const trend = (29 - i) / 29;
-    const n = 1 + Math.floor(Math.random() * 3.6);
-    for (let k = 0; k < n; k++){
-      const r = Math.random();
-      const mode = r < 0.4 ? 'ranked' : r < 0.75 ? 'classic' : 'burst';
-      const rs = Math.random();
-      const size = rs < 0.2 ? 's' : rs < 0.85 ? 'm' : 'l';
-      const dur = Math.random() < 0.7 ? 60 : 30;
-      const rt = Math.round(680 - trend * 170 + (Math.random() - 0.5) * 70);
-      const acc = Math.min(99, 79 + trend * 13 + (Math.random() - 0.5) * 7);
-      const hits = Math.max(8, Math.round((44 + trend * 16 + (Math.random() - 0.5) * 6) * dur / 60));
-      const miss = Math.round(hits * (100 / acc - 1));
-      const score = calcScore(hits, rt, miss, size, dur);
-      const hr = 17 + Math.floor(Math.random() * 6);
-      let t = new Date(day.getFullYear(), day.getMonth(), day.getDate(), hr, Math.floor(Math.random() * 60)).getTime();
-      if (i === 0) t = Math.min(t, Date.now() - (n - k) * 60000);
-
-      const sess = { t, d: dayKey(new Date(t)), mode, size, dur, hits, miss, acc: Math.round(hits / (hits + miss) * 1000) / 10, rt, score };
-
-      if (mode === 'ranked'){
-        const oppRating = clamp(simRating + (Math.random() * 160 - 80), 300, 3000);
-        const bot = botStats(oppRating, dur, size);
-        const result = score > bot.score ? 'win' : score < bot.score ? 'loss' : 'draw';
-        const before = simRating;
-        const after = eloUpdate(before, oppRating, result);
-        sess.result = result; sess.botScore = bot.score; sess.oppRating = Math.round(oppRating);
-        sess.ratingBefore = before; sess.ratingAfter = after; sess.delta = after - before;
-        simRating = after;
-      }
-      out.push(sess);
-    }
-  }
-  sessions = sessions.concat(out).sort((a, b) => a.t - b.t);
-  save(KEY_S, sessions);
-  syncProfileFromSessions();
-  refreshAll();
-});
-
 let clearTimer = 0;
 $('#btn-clear').addEventListener('click', e => {
   const b = e.currentTarget;
@@ -1473,97 +1447,37 @@ $('#btn-clear').addEventListener('click', e => {
 });
 
 /* =========================================================
-   Exportar / importar datos
-   Formato versionado: cada sesión conserva TODOS sus campos al
-   exportar, incluidos los que una versión futura pueda añadir.
-   Al importar solo se exige t (marca de tiempo) y d (día); el
-   resto de campos que falten se normalizan con valores por
-   defecto seguros, así un archivo de una versión distinta
-   (anterior o posterior) siempre se puede volver a cargar.
+   Cuenta / amigos / nube
    ========================================================= */
-const EXPORT_VERSION = 1;
-let ioTimer = 0;
-function setIo(msg){
-  const el = $('#io-status');
-  el.textContent = msg;
-  clearTimeout(ioTimer);
-  ioTimer = setTimeout(() => { el.textContent = ''; }, 7000);
+const ACCOUNT_KEY = 'mira.account.v1';
+const FRIENDS_KEY = 'mira.friends.v1';
+let account = load(ACCOUNT_KEY, {name:'', handle:''});
+let friends = load(FRIENDS_KEY, []);
+if (!Array.isArray(friends)) friends = [];
+function renderSocial(){
+  $('#social-name').textContent = account.name || 'Invitado';
+  $('#account-name').value = account.name || '';
+  $('#account-handle').value = account.handle || '';
+  $('#friend-count').textContent = friends.length;
+  $('#cloud-status').textContent = '● Nube no conectada';
+  $('#friend-list').innerHTML = friends.map((f,i)=>`<li><span>${f}</span><button class="friend-remove" type="button" data-i="${i}" aria-label="Eliminar ${f}">×</button></li>`).join('') || '<li style="color:var(--muted)">Aún no tienes amigos añadidos.</li>';
 }
-
-function exportData(){
-  const payload = {
-    app: 'mira-aim-trainer',
-    version: EXPORT_VERSION,
-    exportedAt: new Date().toISOString(),
-    sessions,
-    profile
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `mira-datos-${dayKey(new Date())}.json`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  setIo(sessions.length
-    ? `Archivo descargado con ${plural(sessions.length, 'sesión', 'sesiones')}. Guárdalo para restaurar tus datos más adelante.`
-    : 'Archivo descargado. Aún no tienes sesiones guardadas.');
-}
-
-function normalizeImported(raw){
-  if (!raw || typeof raw.t !== 'number' || typeof raw.d !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(raw.d)) return null;
-  const s = { ...raw };
-  s.mode = MODES[s.mode] ? s.mode : 'classic';
-  s.size = SIZES[s.size] ? s.size : 'm';
-  s.dur = [30, 60].includes(s.dur) ? s.dur : 60;
-  ['hits', 'miss', 'score', 'rt'].forEach(k => { if (typeof s[k] !== 'number' || !isFinite(s[k])) s[k] = 0; });
-  if (typeof s.acc !== 'number' || !isFinite(s.acc)){
-    s.acc = (s.hits + s.miss) ? Math.round(s.hits / (s.hits + s.miss) * 1000) / 10 : 0;
-  }
-  if (s.mode === 'ranked' && (typeof s.ratingAfter !== 'number' || !['win', 'draw', 'loss'].includes(s.result))){
-    s.mode = 'classic'; // datos ranked incompletos: se conservan como sesión normal
-  }
-  return s;
-}
-
-$('#btn-export').addEventListener('click', exportData);
-$('#btn-import').addEventListener('click', () => $('#import-file').click());
-$('#import-file').addEventListener('change', async e => {
-  const file = e.target.files && e.target.files[0];
-  e.target.value = '';
-  if (!file) return;
-  try {
-    const text = await file.text();
-    const data = JSON.parse(text);
-    const incoming = Array.isArray(data) ? data : Array.isArray(data.sessions) ? data.sessions : null;
-    if (!incoming) throw new Error('formato no reconocido');
-
-    const seen = new Set(sessions.map(s => s.t));
-    let added = 0, skipped = 0;
-    for (const raw of incoming){
-      const s = normalizeImported(raw);
-      if (!s || seen.has(s.t)){ skipped++; continue; }
-      seen.add(s.t);
-      sessions.push(s);
-      added++;
-    }
-    sessions.sort((a, b) => a.t - b.t);
-    save(KEY_S, sessions);
-    syncProfileFromSessions();
-    refreshAll();
-    setIo(added
-      ? `Se importaron ${plural(added, 'sesión', 'sesiones')} nueva${added === 1 ? '' : 's'}${skipped ? ` (${skipped} ya existían o no eran válidas)` : ''}.`
-      : `No se añadió nada nuevo${skipped ? `: ${skipped} sesiones ya existían o no eran válidas` : ''}.`);
-  } catch (err){
-    setIo('No se pudo leer el archivo. Comprueba que sea un backup de Mira válido (.json).');
-  }
+$('#save-account').addEventListener('click',()=>{
+  account={name:$('#account-name').value.trim().slice(0,20),handle:$('#account-handle').value.trim().replace(/^@?/,'@').slice(0,24)};
+  save(ACCOUNT_KEY,account); renderSocial(); setIo('Cuenta guardada en este dispositivo.');
 });
-
+$('#add-friend').addEventListener('click',()=>{
+  let h=$('#friend-handle').value.trim(); if(!h) return; h=h.startsWith('@')?h:'@'+h;
+  if(!friends.includes(h)){friends.push(h);save(FRIENDS_KEY,friends);$('#friend-handle').value='';renderSocial();setIo('Amigo añadido.');}
+});
+$('#friend-list').addEventListener('click',e=>{const b=e.target.closest('.friend-remove');if(!b)return;friends.splice(Number(b.dataset.i),1);save(FRIENDS_KEY,friends);renderSocial();});
+const socialPanel=$('#social-panel'),socialBtn=$('#open-social'),closeSocial=$('#close-social');
+function toggleSocial(open){socialPanel.hidden=!open;socialBtn.setAttribute('aria-expanded',String(open));if(open)renderSocial();}
+socialBtn.addEventListener('click',()=>toggleSocial(socialPanel.hidden));
+closeSocial.addEventListener('click',()=>toggleSocial(false));
 const settingsPanel=$('#settings-panel'),settingsBtn=$('#open-settings');
 settingsBtn.addEventListener('click',()=>{const open=settingsPanel.hidden;settingsPanel.hidden=!open;settingsBtn.setAttribute('aria-expanded',String(open));if(open)syncChips();});
-document.addEventListener('pointerdown',e=>{if(!settingsPanel.hidden&&!settingsPanel.contains(e.target)&&!settingsBtn.contains(e.target)){settingsPanel.hidden=true;settingsBtn.setAttribute('aria-expanded','false');}});
+document.addEventListener('pointerdown',e=>{if(!settingsPanel.hidden&&!settingsPanel.contains(e.target)&&!settingsBtn.contains(e.target)){settingsPanel.hidden=true;settingsBtn.setAttribute('aria-expanded','false');}if(!socialPanel.hidden&&!socialPanel.contains(e.target)&&!socialBtn.contains(e.target)){toggleSocial(false);}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!settingsPanel.hidden){settingsPanel.hidden=true;settingsBtn.setAttribute('aria-expanded','false');settingsBtn.focus();}});
 
 /* =========================================================
@@ -1571,6 +1485,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!settingsPanel.hidd
    ========================================================= */
 applyAppearance();
 syncChips();
+renderSocial();
 updateIdleText();
 updateHud(performance.now());
 renderProfile();
@@ -1580,6 +1495,7 @@ resize();
 </script>
 </body>
 </html>
+
 
 
 
