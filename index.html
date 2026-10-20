@@ -124,6 +124,9 @@ button{font-family:inherit}
 .res-note{margin:18px 0 0;color:var(--muted);font-size:.85rem}
 .today{margin:18px 0 0;color:var(--muted)}
 
+.res-bins{display:flex;align-items:flex-end;gap:3px;height:44px;width:min(360px,100%);margin:0 0 22px}
+.res-bins i{flex:1;min-width:2px;min-height:3px;border-radius:2px 2px 0 0;background:var(--pink);opacity:.8}
+
 /* ---------- calendario ---------- */
 .cal-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(28px,5vw,60px);align-items:start}
 .cal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
@@ -265,18 +268,30 @@ button{font-family:inherit}
         <span class="group-label" id="l-mode">Modo</span>
         <button class="chip" data-k="mode" data-v="classic" title="Un objetivo cada vez">Clásico</button>
         <button class="chip" data-k="mode" data-v="burst" title="Tres objetivos a la vez">Ráfaga</button>
-        <button class="chip" data-k="mode" data-v="ranked" title="Compite contra un bot de tu nivel">Ranked</button>
+        <button class="chip" data-k="mode" data-v="cps" title="Clics por segundo: entrena tu velocidad de clic">CPS</button>
+        <button class="chip" data-k="mode" data-v="ranked" title="Compite contra un bot de tu nivel, en puntería o en CPS">Ranked</button>
       </div>
-      <div class="group" role="group" aria-labelledby="l-size">
+      <div class="group" id="g-disc" role="group" aria-labelledby="l-disc" hidden>
+        <span class="group-label" id="l-disc">Disciplina</span>
+        <button class="chip" data-k="disc" data-v="aim" title="Ranked de puntería">Puntería</button>
+        <button class="chip" data-k="disc" data-v="cps" title="Ranked de clics por segundo">CPS</button>
+      </div>
+      <div class="group" id="g-size" role="group" aria-labelledby="l-size">
         <span class="group-label" id="l-size">Tamaño</span>
         <button class="chip" data-k="size" data-v="s">Pequeño</button>
         <button class="chip" data-k="size" data-v="m">Medio</button>
         <button class="chip" data-k="size" data-v="l">Grande</button>
       </div>
-      <div class="group" role="group" aria-labelledby="l-dur">
+      <div class="group" id="g-dur" role="group" aria-labelledby="l-dur">
         <span class="group-label" id="l-dur">Duración</span>
         <button class="chip" data-k="dur" data-v="30">30 s</button>
         <button class="chip" data-k="dur" data-v="60">60 s</button>
+      </div>
+      <div class="group" id="g-cdur" role="group" aria-labelledby="l-cdur" hidden>
+        <span class="group-label" id="l-cdur">Duración</span>
+        <button class="chip" data-k="cdur" data-v="5">5 s</button>
+        <button class="chip" data-k="cdur" data-v="10">10 s</button>
+        <button class="chip" data-k="cdur" data-v="30">30 s</button>
       </div>
     </div>
 
@@ -284,10 +299,10 @@ button{font-family:inherit}
     <div class="ranked-ladder" id="ranked-ladder" hidden></div>
 
     <div class="hud">
-      <div><span class="num" id="h-score">0</span><span class="cap">puntos</span></div>
+      <div><span class="num" id="h-score">0</span><span class="cap" id="cap-score">puntos</span></div>
       <div class="bot" id="h-bot-wrap" hidden><span class="num" id="h-bot">0</span><span class="cap">bot</span></div>
       <div><span class="num" id="h-time">30.0</span><span class="cap">segundos</span></div>
-      <div><span class="num" id="h-acc">–</span><span class="cap">precisión</span></div>
+      <div><span class="num" id="h-acc">–</span><span class="cap" id="cap-acc">precisión</span></div>
     </div>
 
     <div class="arena">
@@ -339,6 +354,7 @@ button{font-family:inherit}
         <button class="chip" data-k="metric" data-v="acc">Precisión</button>
         <button class="chip" data-k="metric" data-v="rt">Reacción</button>
         <button class="chip" data-k="metric" data-v="hits">Objetivos</button>
+        <button class="chip" data-k="metric" data-v="cps">CPS</button>
         <button class="chip" data-k="metric" data-v="rating">Ranked</button>
       </div>
       <div class="group" role="group" aria-labelledby="l-range">
@@ -369,7 +385,7 @@ button{font-family:inherit}
 
 <footer class="foot">
   <div class="wrap">
-    <p>Tus sesiones se guardan solo en este navegador. Mención honorable a Kilian por dejarme unos caramelos.</p>
+    <p>Tus sesiones se guardan solo en este navegador.</p>
     <div class="links">
       <button class="linkbtn" id="btn-export" type="button">Exportar datos</button>
       <button class="linkbtn" id="btn-import" type="button">Importar datos</button>
@@ -416,9 +432,11 @@ sessions = sessions.filter(s => s && typeof s.t === 'number' && typeof s.d === '
 
 const cfgSaved = load(KEY_C, {});
 const cfg = {
-  mode: ['classic', 'burst', 'ranked'].includes(cfgSaved.mode) ? cfgSaved.mode : 'classic',
+  mode: ['classic', 'burst', 'cps', 'ranked'].includes(cfgSaved.mode) ? cfgSaved.mode : 'classic',
   size: ['s', 'm', 'l'].includes(cfgSaved.size) ? cfgSaved.size : 'm',
   dur:  [30, 60].includes(cfgSaved.dur) ? cfgSaved.dur : 30,
+  cdur: [5, 10, 30].includes(cfgSaved.cdur) ? cfgSaved.cdur : 10,
+  disc: ['aim', 'cps'].includes(cfgSaved.disc) ? cfgSaved.disc : 'aim',
   theme: ['pink','cyan','purple','lime','amber'].includes(cfgSaved.theme) ? cfgSaved.theme : 'pink',
   cursor: ['crosshair','dot','ring','plus'].includes(cfgSaved.cursor) ? cfgSaved.cursor : 'crosshair'
 };
@@ -445,7 +463,7 @@ const COARSE = window.matchMedia && matchMedia('(pointer: coarse)').matches;
    Utilidades
    ========================================================= */
 let PINK = '#ff2ea6';
-const MODES = { classic: 'Clásico', burst: 'Ráfaga', ranked: 'Ranked' };
+const MODES = { classic: 'Clásico', burst: 'Ráfaga', cps: 'CPS', ranked: 'Ranked' };
 const SIZE_NAMES = { s: 'pequeño', m: 'medio', l: 'grande' };
 const SIZES = {
   s: { f: 0.020, min: 13, mult: 1.4 },
@@ -492,6 +510,32 @@ function streak(g){
   while (g.has(dayKey(d))){ n++; d.setDate(d.getDate() - 1); }
   return n;
 }
+/* ---- CPS: ayudas ---- */
+const isCps = s => !!s && s.disc === 'cps';
+const fmtCps = v => (Math.round(v * 10) / 10).toFixed(1).replace('.', ',');
+const cpsKind = () => cfg.mode === 'cps' || (cfg.mode === 'ranked' && cfg.disc === 'cps');
+const curDur = () => cpsKind() ? cfg.cdur : cfg.dur;
+
+/* Estadísticas de una tanda de clics. times = ms desde el primer clic. */
+function cpsStats(times, D){
+  const n = times.length;
+  const bins = new Array(D).fill(0);
+  for (const t of times) bins[Math.min(D - 1, Math.floor(t / 1000))]++;
+  let peak = 0, j = 0;
+  for (let i = 0; i < n; i++){
+    while (times[i] - times[j] >= 1000) j++;
+    peak = Math.max(peak, i - j + 1);
+  }
+  const cps = n / D;
+  const sd = Math.sqrt(bins.reduce((a, b) => a + (b - cps) * (b - cps), 0) / D);
+  const cons = n ? clamp(Math.round((1 - sd / cps) * 100), 0, 100) : 0;
+  return { clicks: n, cps: Math.round(cps * 100) / 100, peak, cons, bins };
+}
+function aggCps(list){
+  const clicks = sum(list, 'clicks'), secs = sum(list, 'dur');
+  return { n: list.length, clicks, cps: secs ? clicks / secs : 0, best: Math.max(...list.map(s => s.cps || 0)) };
+}
+
 function calcScore(hits, rt, miss, size, dur){
   const bonus = Math.max(0, 1 - rt / 1200) * 100;
   const raw = hits * (100 + bonus) * SIZES[size].mult - miss * 25;
@@ -508,7 +552,9 @@ function levelFromXp(xp){
   return { level: lvl, into: rem, need };
 }
 function xpGain(s){
-  let base = Math.round(s.score / 9) + Math.round(s.hits * 0.85);
+  let base = isCps(s)
+    ? Math.round((s.clicks || 0) * 2.5)
+    : Math.round(s.score / 9) + Math.round(s.hits * 0.85);
   if (s.mode === 'ranked'){
     base += s.result === 'win' ? 45 : s.result === 'draw' ? 22 : 12;
   }
@@ -551,6 +597,15 @@ function botStats(rating, dur, size){
   const hits = Math.max(3, Math.round(rate * dur * (0.85 + Math.random() * 0.3)));
   const miss = Math.max(0, Math.round(hits * (100 / acc - 1)));
   return { hits, miss, acc: Math.round(acc * 10) / 10, rt, score: calcScore(hits, rt, miss, size, dur) };
+}
+/* Bot de CPS: el ritmo sube con el rating (≈3,6 CPS en Bronce, ≈11 en Ruby alto)
+   y baja un poco cuanto más larga es la prueba, igual que le pasa a una persona. */
+function botCps(rating, dur){
+  const t = clamp((rating - 700) / 1300, 0, 1);
+  const fade = 1.12 - 0.07 * Math.log2(dur / 5);
+  const cps = (3.4 + t * 8.1) * fade * (1 + (Math.random() - 0.5) * 0.14);
+  const clicks = Math.max(3, Math.round(cps * dur));
+  return { clicks, cps: Math.round(clicks / dur * 100) / 100, score: Math.round(clicks / dur * 100), seed: Math.floor(Math.random() * 7) };
 }
 function eloUpdate(rating, oppRating, result){
   const K = 48;
@@ -648,9 +703,11 @@ const ovRes = $('#ov-res');
 const settings = $('#settings');
 const hs = $('#h-score'), ht = $('#h-time'), ha = $('#h-acc');
 const hBotWrap = $('#h-bot-wrap'), hBot = $('#h-bot');
+const capScore = $('#cap-score'), capAcc = $('#cap-acc');
 
 let W = 0, H = 0, dpr = 1, raf = 0;
-const G = { phase: 'idle', t0: 0, start: 0, end: 0, targets: [], fx: [], hits: 0, miss: 0, rtSum: 0, raw: 0, last: null, bot: null, botRating: null };
+const G = { phase: 'idle', t0: 0, start: 0, end: 0, targets: [], fx: [], hits: 0, miss: 0, rtSum: 0, raw: 0, last: null, bot: null, botRating: null,
+  cps: false, dur: 30, cl: [], started: false, lastClick: 0 };
 
 try { document.fonts && document.fonts.load('600 64px Unbounded'); } catch (e) {}
 
@@ -680,6 +737,46 @@ function drawTarget(x, y, rad, alpha){
   ctx.restore();
 }
 
+/* Arena de CPS: un anillo que late con cada clic y un arco que marca el tiempo restante. */
+function drawCps(now){
+  const cx = W / 2, cy = H / 2, R0 = Math.min(W, H) * 0.24;
+  const kick = RM || !G.lastClick ? 0 : Math.exp(-(now - G.lastClick) / 110);
+  const prog = G.started ? clamp((now - G.start) / (G.dur * 1000), 0, 1) : 0;
+  const rr = R0 * (1 - 0.06 * kick);
+  ctx.save();
+  ctx.fillStyle = PINK; ctx.strokeStyle = PINK;
+  ctx.shadowColor = PINK; ctx.shadowBlur = 30;
+  ctx.globalAlpha = 0.10 + 0.30 * kick;
+  ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.lineWidth = Math.max(2, R0 * 0.05);
+  ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2); ctx.stroke();
+  // tiempo restante
+  ctx.lineCap = 'round';
+  ctx.lineWidth = Math.max(3, R0 * 0.06);
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 0.16;
+  ctx.beginPath(); ctx.arc(cx, cy, R0 * 1.22, 0, Math.PI * 2); ctx.stroke();
+  if (G.started && prog < 1){
+    ctx.globalAlpha = 1; ctx.shadowBlur = 14;
+    ctx.beginPath(); ctx.arc(cx, cy, R0 * 1.22, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - prog)); ctx.stroke();
+  }
+  // texto central
+  ctx.globalAlpha = 1; ctx.shadowBlur = 24;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  if (G.started){
+    ctx.font = `600 ${R0 * 0.8}px Unbounded, system-ui, sans-serif`;
+    ctx.fillText(String(G.cl.length), cx, cy);
+  } else {
+    ctx.font = `600 ${Math.min(34, R0 * 0.34)}px Unbounded, system-ui, sans-serif`;
+    ctx.fillText('¡Clic!', cx, cy);
+    ctx.shadowBlur = 0; ctx.globalAlpha = 0.8;
+    ctx.font = `500 ${Math.max(12, Math.min(15, W * 0.036))}px 'Hanken Grotesk', system-ui, sans-serif`;
+    ctx.fillText('El tiempo empieza con tu primer clic', cx, cy + R0 * 1.62);
+  }
+  ctx.restore();
+}
+
 function draw(now){
   if (!W) return;
   ctx.clearRect(0, 0, W, H);
@@ -704,6 +801,7 @@ function draw(now){
     return;
   }
   if (G.phase === 'play'){
+    if (G.cps) drawCps(now);
     for (const t of G.targets){
       const k = RM ? 1 : Math.min(1, (now - t.born) / 140);
       const e = 1 - Math.pow(1 - k, 3);
@@ -749,22 +847,41 @@ function setText(el, txt){ if (el.textContent !== txt) el.textContent = txt; }
 
 function botShown(now){
   if (!G.bot) return 0;
-  if (G.phase === 'done') return G.bot.score;
+  const total = G.cps ? G.bot.clicks : G.bot.score;
+  if (G.phase === 'done') return total;
   if (G.phase !== 'play') return 0;
-  const frac = clamp((now - G.start) / (cfg.dur * 1000), 0, 1);
-  const wobble = Math.sin(frac * 23 + (G.bot.rt % 7)) * G.bot.score * 0.05 * (1 - frac);
-  return Math.max(0, Math.round(G.bot.score * frac + wobble));
+  if (G.cps && !G.started) return 0;
+  const frac = clamp((now - G.start) / (G.dur * 1000), 0, 1);
+  const seed = G.cps ? G.bot.seed : G.bot.rt % 7;
+  const wobble = Math.sin(frac * 23 + seed) * total * 0.05 * (1 - frac);
+  return Math.max(0, Math.round(total * frac + wobble));
 }
 
 function updateHud(now){
   const live = G.phase === 'play' || G.phase === 'done';
-  setText(hs, nf(live ? Math.max(0, G.raw * 60 / cfg.dur) : 0));
-  let left = cfg.dur;
-  if (G.phase === 'play') left = Math.max(0, (G.end - now) / 1000);
+  const idle = G.phase === 'idle';
+  const D = idle ? curDur() : G.dur;
+  const isC = idle ? cpsKind() : G.cps;
+  setText(capScore, isC ? 'clics' : 'puntos');
+  setText(capAcc, isC ? 'CPS' : 'precisión');
+  let left = D;
+  if (G.phase === 'play') left = (isC && !G.started) ? D : Math.max(0, (G.end - now) / 1000);
   if (G.phase === 'done') left = 0;
   setText(ht, left.toFixed(1));
-  const tot = G.hits + G.miss;
-  setText(ha, tot ? Math.round(G.hits / tot * 100) + '\u00a0%' : '–');
+  if (isC){
+    const n = G.cl.length;
+    setText(hs, nf(live ? n : 0));
+    let v = 0;
+    if (n){
+      const el = G.phase === 'done' ? D : Math.min((now - G.start) / 1000, D);
+      v = n / Math.max(el, Math.min(1, D));
+    }
+    setText(ha, n ? fmtCps(v) : '–');
+  } else {
+    setText(hs, nf(live ? Math.max(0, G.raw * 60 / D) : 0));
+    const tot = G.hits + G.miss;
+    setText(ha, tot ? Math.round(G.hits / tot * 100) + '\u00a0%' : '–');
+  }
   hBotWrap.hidden = cfg.mode !== 'ranked';
   if (cfg.mode === 'ranked') setText(hBot, nf(botShown(now)));
 }
@@ -772,10 +889,15 @@ function updateHud(now){
 function tick(now){
   if (G.phase === 'countdown' && now - G.t0 >= 1500){
     G.phase = 'play';
-    G.start = now;
-    G.end = now + cfg.dur * 1000;
-    const n = cfg.mode === 'burst' ? 3 : 1;
-    for (let i = 0; i < n; i++) spawn(now);
+    if (G.cps){
+      // en CPS el reloj arranca con el primer clic
+      G.start = 0; G.end = Infinity; G.started = false;
+    } else {
+      G.start = now;
+      G.end = now + G.dur * 1000;
+      const n = cfg.mode === 'burst' ? 3 : 1;
+      for (let i = 0; i < n; i++) spawn(now);
+    }
   } else if (G.phase === 'play' && now >= G.end){
     finish();
     return;
@@ -788,12 +910,15 @@ function tick(now){
 function startGame(){
   cancelAnimationFrame(raf);
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  const kindCps = cpsKind();
+  const D = kindCps ? cfg.cdur : cfg.dur;
   const bot = cfg.mode === 'ranked'
-    ? (() => { const r = clamp(profile.rating + (Math.random() * 160 - 80), 300, 3000); return { rating: r, stats: botStats(r, cfg.dur, cfg.size) }; })()
+    ? (() => { const r = clamp(profile.rating + (Math.random() * 160 - 80), 300, 3000); return { rating: r, stats: kindCps ? botCps(r, D) : botStats(r, D, cfg.size) }; })()
     : null;
   Object.assign(G, {
     phase: 'countdown', t0: performance.now(), targets: [], fx: [],
     hits: 0, miss: 0, rtSum: 0, raw: 0, last: null,
+    cps: kindCps, dur: D, cl: [], started: false, lastClick: 0,
     bot: bot ? bot.stats : null, botRating: bot ? bot.rating : null
   });
   ovIdle.hidden = true;
@@ -805,7 +930,7 @@ function startGame(){
 
 function cancelGame(){
   cancelAnimationFrame(raf);
-  Object.assign(G, { phase: 'idle', targets: [], fx: [], hits: 0, miss: 0, rtSum: 0, raw: 0, last: null, bot: null, botRating: null });
+  Object.assign(G, { phase: 'idle', targets: [], fx: [], hits: 0, miss: 0, rtSum: 0, raw: 0, last: null, bot: null, botRating: null, cps: false, cl: [], started: false, lastClick: 0 });
   ovIdle.hidden = false;
   ovRes.hidden = true;
   settings.removeAttribute('inert');
@@ -816,24 +941,40 @@ function cancelGame(){
 function finish(){
   cancelAnimationFrame(raf);
   G.phase = 'done';
-  const { hits, miss } = G;
-  const tot = hits + miss;
-  const acc = tot ? hits / tot * 100 : 0;
-  const rt = hits ? G.rtSum / hits : 0;
-  const score = Math.max(0, Math.round(G.raw * 60 / cfg.dur));
-  const prevBest = sessions.reduce((m, s) => Math.max(m, s.score), 0);
-  const s = {
-    t: Date.now(), d: dayKey(new Date()),
-    mode: cfg.mode, size: cfg.size, dur: cfg.dur,
-    hits, miss, acc: Math.round(acc * 10) / 10, rt: Math.round(rt), score
-  };
+  const D = G.dur;
+  let s, tot, record = false;
+
+  if (G.cps){
+    const st = cpsStats(G.cl, D);
+    tot = st.clicks;
+    const prevBest = sessions.reduce((m, x) => isCps(x) && x.dur === D ? Math.max(m, x.cps || 0) : m, 0);
+    record = prevBest > 0 && st.cps > prevBest;
+    s = {
+      t: Date.now(), d: dayKey(new Date()),
+      mode: cfg.mode, size: cfg.size, dur: D, disc: 'cps',
+      hits: 0, miss: 0, acc: 0, rt: 0, score: Math.round(st.clicks / D * 100),
+      clicks: st.clicks, cps: st.cps, peak: st.peak, cons: st.cons, bins: st.bins
+    };
+  } else {
+    const { hits, miss } = G;
+    tot = hits + miss;
+    const acc = tot ? hits / tot * 100 : 0;
+    const rt = hits ? G.rtSum / hits : 0;
+    const score = Math.max(0, Math.round(G.raw * 60 / D));
+    s = {
+      t: Date.now(), d: dayKey(new Date()),
+      mode: cfg.mode, size: cfg.size, dur: D,
+      hits, miss, acc: Math.round(acc * 10) / 10, rt: Math.round(rt), score
+    };
+  }
 
   let rankedInfo = null;
   if (cfg.mode === 'ranked' && G.bot){
-    const result = score > G.bot.score ? 'win' : score < G.bot.score ? 'loss' : 'draw';
+    const result = s.score > G.bot.score ? 'win' : s.score < G.bot.score ? 'loss' : 'draw';
     const before = profile.rating;
     const after = eloUpdate(before, G.botRating, result);
     s.result = result; s.botScore = G.bot.score; s.oppRating = Math.round(G.botRating);
+    if (G.cps) s.botCps = G.bot.cps;
     s.ratingBefore = before; s.ratingAfter = after; s.delta = after - before;
     rankedInfo = { result, bot: G.bot, before, after, delta: after - before };
   }
@@ -852,32 +993,53 @@ function finish(){
   draw(performance.now());
   updateHud(performance.now());
   renderProfile();
-  showResults(s, tot > 0, gained, levelAfter, levelAfter > levelBefore, rankedInfo);
+  showResults(s, tot > 0, gained, levelAfter, levelAfter > levelBefore, rankedInfo, record);
   renderToday();
 }
 
-function showResults(s, saved, gained, levelAfter, leveledUp, ranked){
+function showResults(s, saved, gained, levelAfter, leveledUp, ranked, record){
   ovIdle.hidden = true;
   ovRes.hidden = false;
+  const isC = isCps(s);
+  const recBadge = record && !ranked;
+  const lvlBadge = leveledUp && !ranked && !recBadge;
+  const lvlNote = leveledUp && !lvlBadge;
 
   let rankedBlock = '';
   if (ranked){
     const label = ranked.result === 'win' ? 'Victoria' : ranked.result === 'draw' ? 'Empate' : 'Derrota';
     const tier = tierFor(ranked.after);
     const sign = ranked.delta > 0 ? '+' : '';
+    const you = isC ? `${fmtCps(s.cps)}\u00a0CPS` : nf(s.score);
+    const bot = isC ? `${fmtCps(ranked.bot.cps)}\u00a0CPS` : nf(ranked.bot.score);
     rankedBlock = `
       <p class="res-badge">${label} contra el bot</p>
       <div class="res-vs">
-        <span class="side"><span>Tú</span><span>${nf(s.score)}</span></span>
+        <span class="side"><span>Tú</span><span>${you}</span></span>
         <span class="mid">vs</span>
-        <span class="side"><span>Bot</span><span>${nf(ranked.bot.score)}</span></span>
+        <span class="side"><span>Bot</span><span>${bot}</span></span>
       </div>
       <p class="res-xp">${sign}${ranked.delta}\u00a0Elo · ahora <b>${nf(ranked.after)}</b> (<span class="rank-icon ${tierClass(tier.name)}">${tierIcon(tier.name)}</span>${tier.name})</p>`;
   }
 
-  ovRes.innerHTML = `
-    ${!ranked && leveledUp ? `<p class="res-badge">Subiste al nivel ${levelAfter}</p>` : ''}
-    ${rankedBlock}
+  let mainBlock;
+  if (isC){
+    const bins = Array.isArray(s.bins) ? s.bins : [];
+    const mx = Math.max(1, ...bins);
+    const binsHtml = bins.length
+      ? `<div class="res-bins" role="img" aria-label="Clics en cada segundo: ${bins.join(', ')}">${bins.map((b, i) => `<i style="height:${Math.max(7, Math.round(b / mx * 100))}%" title="Segundo ${i + 1}: ${b}"></i>`).join('')}</div>`
+      : '';
+    mainBlock = `
+    <div class="res-score">${fmtCps(s.cps)}</div>
+    <p class="res-unit">clics por segundo</p>
+    ${binsHtml}
+    <dl class="res-stats">
+      <div><dt>clics</dt><dd>${s.clicks}</dd></div>
+      <div><dt>mejor segundo</dt><dd>${s.peak}</dd></div>
+      <div><dt>constancia</dt><dd>${s.cons}\u00a0%</dd></div>
+    </dl>`;
+  } else {
+    mainBlock = `
     <div class="res-score">${nf(s.score)}</div>
     <p class="res-unit">puntos</p>
     <dl class="res-stats">
@@ -885,13 +1047,20 @@ function showResults(s, saved, gained, levelAfter, leveledUp, ranked){
       <div><dt>precisión</dt><dd>${Math.round(s.acc)}\u00a0%</dd></div>
       <div><dt>reacción</dt><dd>${s.hits ? s.rt + '\u00a0ms' : '–'}</dd></div>
       <div><dt>fallos</dt><dd>${s.miss}</dd></div>
-    </dl>
-    ${saved ? `<p class="res-xp">+${gained}\u00a0XP${ranked && leveledUp ? ` · subiste al nivel ${levelAfter}` : ''}</p>` : ''}
+    </dl>`;
+  }
+
+  ovRes.innerHTML = `
+    ${recBadge ? '<p class="res-badge">Nuevo récord de CPS</p>' : ''}
+    ${lvlBadge ? `<p class="res-badge">Subiste al nivel ${levelAfter}</p>` : ''}
+    ${rankedBlock}
+    ${mainBlock}
+    ${saved ? `<p class="res-xp">+${gained}\u00a0XP${lvlNote ? ` · subiste al nivel ${levelAfter}` : ''}</p>` : ''}
     <div class="actions">
       <button class="btn primary" id="again" type="button" disabled>Jugar otra vez</button>
       <button class="btn" id="see-charts" type="button">Ver gráficas</button>
     </div>
-    <p class="res-note">${saved ? 'Sesión guardada en tu calendario.' : 'No se guardó la sesión porque no hubo ningún clic.'}</p>`;
+    <p class="res-note">${saved ? `Sesión guardada en tu calendario.${record && ranked ? ' Nuevo récord de CPS.' : ''}` : 'No se guardó la sesión porque no hubo ningún clic.'}</p>`;
   const again = $('#again');
   again.addEventListener('click', startGame);
   $('#see-charts').addEventListener('click', () => setView('charts'));
@@ -905,6 +1074,16 @@ canvas.addEventListener('pointerdown', e => {
   const rect = canvas.getBoundingClientRect();
   const px = e.clientX - rect.left, py = e.clientY - rect.top;
   const now = performance.now();
+
+  if (G.cps){
+    if (!G.started){ G.started = true; G.start = now; G.end = now + G.dur * 1000; }
+    else if (now >= G.end) return;
+    G.cl.push(now - G.start);
+    G.lastClick = now;
+    if (!RM) G.fx.push({ kind: 'hit', x: px, y: py, r: 14, t: now });
+    return;
+  }
+
   const R = radius() * 1.08;
 
   let idx = -1, best = Infinity;
@@ -937,6 +1116,7 @@ document.addEventListener('keydown', e => {
     if (!['BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA'].includes(tag)){ e.preventDefault(); startGame(); }
   }
 });
+canvas.addEventListener('contextmenu', e => { if (G.phase === 'play' || G.phase === 'countdown') e.preventDefault(); });
 ovIdle.addEventListener('click', startGame);
 
 document.addEventListener('visibilitychange', () => {
@@ -946,27 +1126,47 @@ document.addEventListener('visibilitychange', () => {
 new ResizeObserver(() => resize()).observe($('.arena'));
 
 function updateIdleText(){
+  const kind = cpsKind();
+  const D = curDur();
+  const note = $('#ranked-note'), ladder = $('#ranked-ladder');
   $('#idle-title').textContent = COARSE ? 'Toca para empezar' : 'Haz clic para empezar';
   if (cfg.mode === 'ranked'){
     const tier = tierFor(profile.rating);
-    $('#idle-sub').textContent = `Ranked, contra un bot a tu nivel, tamaño ${SIZE_NAMES[cfg.size]}, ${cfg.dur} s`;
-    $('#ranked-note').hidden = false;
-    $('#ranked-ladder').hidden = false;
-    $('#ranked-note').innerHTML = `Tu rango actual es <b>${tier.name}</b> con <b>${nf(profile.rating)}</b> puntos. El bot se ajusta a tu nivel.`;
+    $('#idle-sub').textContent = kind
+      ? `Ranked CPS, contra un bot a tu nivel, ${D} s. El tiempo empieza con tu primer clic`
+      : `Ranked, contra un bot a tu nivel, tamaño ${SIZE_NAMES[cfg.size]}, ${cfg.dur} s`;
+    note.hidden = false;
+    ladder.hidden = false;
+    note.innerHTML = `Tu rango actual es <b>${tier.name}</b> con <b>${nf(profile.rating)}</b> puntos. El bot se ajusta a tu nivel, y la puntería y los CPS suman en el mismo rango.`;
     renderRankLadder(profile.rating);
   } else {
-    $('#idle-sub').textContent = `${MODES[cfg.mode]}, tamaño ${SIZE_NAMES[cfg.size]}, ${cfg.dur} s`;
-    $('#ranked-note').hidden = true;
+    $('#idle-sub').textContent = cfg.mode === 'cps'
+      ? `CPS, ${D} s. El tiempo empieza con tu primer clic`
+      : `${MODES[cfg.mode]}, tamaño ${SIZE_NAMES[cfg.size]}, ${cfg.dur} s`;
+    note.hidden = true;
+    ladder.hidden = true;
   }
   hBotWrap.hidden = cfg.mode !== 'ranked';
+  $('#g-disc').hidden = cfg.mode !== 'ranked';
+  $('#g-size').hidden = kind;
+  $('#g-dur').hidden = kind;
+  $('#g-cdur').hidden = !kind;
+  canvas.setAttribute('aria-label', kind
+    ? 'Zona de CPS: haz clic donde quieras, lo más rápido que puedas'
+    : 'Zona de entrenamiento: haz clic en los objetivos rosas');
 }
 
 function renderToday(){
   const g = groupByDay();
   const list = g.get(dayKey(new Date())) || [];
-  let txt = list.length
-    ? `Hoy llevas ${plural(list.length, 'sesión', 'sesiones')} y tu mejor puntuación es ${nf(Math.max(...list.map(s => s.score)))}.`
-    : 'Aún no has entrenado hoy.';
+  const aim = list.filter(s => !isCps(s)), cp = list.filter(isCps);
+  let txt;
+  if (!list.length) txt = 'Aún no has entrenado hoy.';
+  else {
+    txt = `Hoy llevas ${plural(list.length, 'sesión', 'sesiones')}`;
+    txt += aim.length ? ` y tu mejor puntuación es ${nf(Math.max(...aim.map(s => s.score)))}.` : '.';
+    if (cp.length) txt += ` Tu mejor ritmo de clics es ${fmtCps(Math.max(...cp.map(s => s.cps || 0)))}\u00a0CPS.`;
+  }
   const st = streak(g);
   if (st > 1) txt += ` Racha de ${st} días.`;
   $('#today').textContent = txt;
@@ -1022,18 +1222,29 @@ function renderDetail(){
     h += `<p class="muted">No hay sesiones este día.</p>`;
     if (selDay === todayK) h += `<button class="btn primary" id="detail-go" type="button">Entrenar ahora</button>`;
   } else {
-    const a = agg(list);
-    h += `<p class="muted">${plural(a.n, 'sesión', 'sesiones')}. Mejor puntuación ${nf(a.best)} y precisión media del ${Math.round(a.acc)}\u00a0%.</p><ul class="sess">`;
+    const aimL = list.filter(x => !isCps(x)), cpsL = list.filter(isCps);
+    let summary = plural(list.length, 'sesión', 'sesiones') + '.';
+    if (aimL.length){ const a = agg(aimL); summary += ` Mejor puntuación ${nf(a.best)} y precisión media del ${Math.round(a.acc)}\u00a0%.`; }
+    if (cpsL.length) summary += ` Mejor ritmo de clics: ${fmtCps(Math.max(...cpsL.map(x => x.cps || 0)))}\u00a0CPS.`;
+    h += `<p class="muted">${summary}</p><ul class="sess">`;
     for (const s of list){
       const time = new Date(s.t).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
       const tag = s.mode === 'ranked'
         ? `<span class="tag${s.result === 'win' ? ' win' : ''}">${s.result === 'win' ? 'victoria' : s.result === 'draw' ? 'empate' : 'derrota'}${s.delta != null ? ` ${s.delta > 0 ? '+' : ''}${s.delta}` : ''}</span>`
         : '';
+      const c = isCps(s);
+      const title = c
+        ? `${MODES[s.mode] || s.mode}${s.mode === 'ranked' ? ' CPS' : ''}, ${s.dur} s`
+        : `${MODES[s.mode] || s.mode}, ${SIZE_NAMES[s.size] || s.size}, ${s.dur} s`;
+      const val = c ? `${fmtCps(s.cps || 0)}\u00a0CPS` : nf(s.score);
+      const meta = c
+        ? `${plural(s.clicks || 0, 'clic', 'clics')}, mejor segundo ${s.peak || 0}, constancia del ${s.cons || 0}\u00a0%`
+        : `${plural(s.hits, 'objetivo', 'objetivos')}, ${Math.round(s.acc)}\u00a0% de precisión${s.hits ? `, ${s.rt}\u00a0ms de reacción` : ''}`;
       h += `<li>
         <span class="t">${time}</span>
-        <span>${MODES[s.mode] || s.mode}, ${SIZE_NAMES[s.size] || s.size}, ${s.dur} s${tag}</span>
-        <span class="s">${nf(s.score)}</span>
-        <span class="meta">${plural(s.hits, 'objetivo', 'objetivos')}, ${Math.round(s.acc)}\u00a0% de precisión${s.hits ? `, ${s.rt}\u00a0ms de reacción` : ''}</span>
+        <span>${title}${tag}</span>
+        <span class="s">${val}</span>
+        <span class="meta">${meta}</span>
       </li>`;
     }
     h += '</ul>';
@@ -1064,24 +1275,29 @@ $('#cal-today').addEventListener('click', () => {
    ========================================================= */
 const METRICS = {
   score: {
-    label: 'Puntos', get: a => a.score, sess: s => s.score, zero: true, better: 'up',
+    label: 'Puntos', only: 'aim', get: a => a.score, sess: s => s.score, zero: true, better: 'up',
     fmt: v => `${nf(v)} puntos`, axis: v => nf(v), big: v => [nf(v), 'puntos'],
     cap: N => `de media por sesión en los últimos ${N} días`
   },
   acc: {
-    label: 'Precisión', get: a => a.acc, sess: s => s.acc, cap100: true, better: 'up',
+    label: 'Precisión', only: 'aim', get: a => a.acc, sess: s => s.acc, cap100: true, better: 'up',
     fmt: v => `${v.toFixed(1).replace('.', ',')}\u00a0%`, axis: v => `${Math.round(v)}%`, big: v => [v.toFixed(1).replace('.', ','), '%'],
     cap: N => `de precisión media en los últimos ${N} días`
   },
   rt: {
-    label: 'Reacción', get: a => a.hits ? a.rt : null, sess: s => s.hits ? s.rt : null, better: 'down',
+    label: 'Reacción', only: 'aim', get: a => a.hits ? a.rt : null, sess: s => s.hits ? s.rt : null, better: 'down',
     fmt: v => `${nf(v)}\u00a0ms`, axis: v => nf(v), big: v => [nf(v), 'ms'],
     cap: N => `de tiempo de reacción medio en los últimos ${N} días`
   },
   hits: {
-    label: 'Objetivos', get: a => a.hits, sess: null, zero: true, better: 'up',
+    label: 'Objetivos', only: 'aim', get: a => a.hits, sess: null, zero: true, better: 'up',
     fmt: v => `${nf(v)} objetivos`, axis: v => nf(v), big: v => [nf(v), 'objetivos'],
     cap: N => `al día de media, contando los días que entrenaste en los últimos ${N}`
+  },
+  cps: {
+    label: 'CPS', only: 'cps', get: a => a.cps, sess: s => s.cps, better: 'up',
+    fmt: v => `${fmtCps(v)}\u00a0CPS`, axis: v => String(+v.toFixed(1)).replace('.', ','), big: v => [fmtCps(v), 'CPS'],
+    cap: N => `de clics por segundo de media en los últimos ${N} días`
   },
   rating: {
     label: 'Ranked', kind: 'rating', sess: null, better: 'up',
@@ -1095,13 +1311,14 @@ function dailyVals(endDate, N, M){
   const out = [];
   for (let i = N - 1; i >= 0; i--){
     const d = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - i);
-    const list = g.get(dayKey(d)) || [];
+    const raw = g.get(dayKey(d)) || [];
+    const list = M.only === 'cps' ? raw.filter(isCps) : M.only === 'aim' ? raw.filter(x => !isCps(x)) : raw;
     let v = null, a = null;
     if (M.kind === 'rating'){
       const rl = list.filter(s => s.mode === 'ranked' && s.ratingAfter != null).sort((x, y) => x.t - y.t);
       if (rl.length) v = rl[rl.length - 1].ratingAfter;
     } else {
-      a = list.length ? agg(list) : null;
+      a = list.length ? (M.only === 'cps' ? aggCps(list) : agg(list)) : null;
       v = a ? M.get(a) : null;
     }
     out.push({ d, list, a, v });
@@ -1149,8 +1366,10 @@ function renderCharts(){
     big.innerHTML = '–';
     capEl.textContent = isRating ? 'Aún no has jugado en modo ranked.' : 'Sin datos en este periodo.';
     $('#chart-empty-txt').innerHTML = isRating
-      ? 'No hay partidas ranked en este periodo.<br>Juega contra un bot para ver tu progreso de rango.'
-      : 'No hay sesiones en este periodo.<br>Entrena una para ver tu evolución día a día.';
+      ? 'No hay partidas ranked en este periodo.<br>Juega contra un bot (puntería o CPS) para ver tu progreso de rango.'
+      : chartMetric === 'cps'
+        ? 'No hay sesiones de CPS en este periodo.<br>Prueba el modo CPS para ver tu velocidad de clic día a día.'
+        : 'No hay sesiones en este periodo.<br>Entrena una para ver tu evolución día a día.';
     svgBox.innerHTML = '';
     svgBox.hidden = true; tip.hidden = true; empty.hidden = false;
     CH = null;
@@ -1343,6 +1562,7 @@ function syncChips(){
   $$('.chip[data-k]').forEach(c => {
     const k = c.dataset.k;
     const cur = k === 'mode' ? cfg.mode : k === 'size' ? cfg.size : k === 'dur' ? String(cfg.dur)
+              : k === 'cdur' ? String(cfg.cdur) : k === 'disc' ? cfg.disc
               : k === 'metric' ? chartMetric : String(chartRange);
     c.setAttribute('aria-pressed', String(c.dataset.v === cur));
   });
@@ -1351,8 +1571,8 @@ document.addEventListener('click', e => {
   const c = e.target.closest('.chip[data-k]');
   if (!c) return;
   const k = c.dataset.k, v = c.dataset.v;
-  if (k === 'mode' || k === 'size' || k === 'dur' || k === 'theme' || k === 'cursor'){
-    cfg[k] = k === 'dur' ? Number(v) : v;
+  if (k === 'mode' || k === 'size' || k === 'dur' || k === 'cdur' || k === 'disc' || k === 'theme' || k === 'cursor'){
+    cfg[k] = (k === 'dur' || k === 'cdur') ? Number(v) : v;
     save(KEY_C, cfg);
     if (k === 'theme' || k === 'cursor') applyAppearance();
     if (G.phase === 'done') cancelGame();
@@ -1409,6 +1629,20 @@ function refreshAll(){
   if (view === 'charts'){ activeIdx = null; renderCharts(); }
 }
 
+/* Sesión de CPS simulada para los datos de ejemplo (con algo de fatiga y ruido). */
+function simCps(dur, trend){
+  const f = d => 1.12 - 0.07 * Math.log2(d / 5);
+  const base = (5.4 + trend * 1.8 + (Math.random() - 0.5) * 0.9) * f(dur) / f(10);
+  const times = [];
+  for (let i = 0; i < dur; i++){
+    let c = base * (1 - 0.12 * (i / dur)) + (Math.random() - 0.5) * 1.4;
+    if (i === 0) c *= 0.85;
+    c = Math.max(0, Math.floor(c + Math.random()));
+    for (let j = 0; j < c; j++) times.push(i * 1000 + (j + Math.random() * 0.8) * 1000 / c);
+  }
+  return cpsStats(times, dur);
+}
+
 $('#btn-sample').addEventListener('click', () => {
   const out = [];
   const t0 = new Date(); t0.setHours(0, 0, 0, 0);
@@ -1420,25 +1654,33 @@ $('#btn-sample').addEventListener('click', () => {
     const n = 1 + Math.floor(Math.random() * 3.6);
     for (let k = 0; k < n; k++){
       const r = Math.random();
-      const mode = r < 0.4 ? 'ranked' : r < 0.75 ? 'classic' : 'burst';
+      const mode = r < 0.36 ? 'ranked' : r < 0.62 ? 'classic' : r < 0.82 ? 'burst' : 'cps';
+      const cpsRun = mode === 'cps' || (mode === 'ranked' && Math.random() < 0.35);
       const rs = Math.random();
       const size = rs < 0.2 ? 's' : rs < 0.85 ? 'm' : 'l';
-      const dur = Math.random() < 0.7 ? 60 : 30;
-      const rt = Math.round(680 - trend * 170 + (Math.random() - 0.5) * 70);
-      const acc = Math.min(99, 79 + trend * 13 + (Math.random() - 0.5) * 7);
-      const hits = Math.max(8, Math.round((44 + trend * 16 + (Math.random() - 0.5) * 6) * dur / 60));
-      const miss = Math.round(hits * (100 / acc - 1));
-      const score = calcScore(hits, rt, miss, size, dur);
       const hr = 17 + Math.floor(Math.random() * 6);
       let t = new Date(day.getFullYear(), day.getMonth(), day.getDate(), hr, Math.floor(Math.random() * 60)).getTime();
       if (i === 0) t = Math.min(t, Date.now() - (n - k) * 60000);
 
-      const sess = { t, d: dayKey(new Date(t)), mode, size, dur, hits, miss, acc: Math.round(hits / (hits + miss) * 1000) / 10, rt, score };
+      let dur, sess;
+      if (cpsRun){
+        dur = [5, 10, 10, 30][Math.floor(Math.random() * 4)];
+        sess = { t, d: dayKey(new Date(t)), mode, size, dur, disc: 'cps', hits: 0, miss: 0, acc: 0, rt: 0, ...simCps(dur, trend) };
+        sess.score = Math.round(sess.clicks / dur * 100);
+      } else {
+        dur = Math.random() < 0.7 ? 60 : 30;
+        const rt = Math.round(680 - trend * 170 + (Math.random() - 0.5) * 70);
+        const acc = Math.min(99, 79 + trend * 13 + (Math.random() - 0.5) * 7);
+        const hits = Math.max(8, Math.round((44 + trend * 16 + (Math.random() - 0.5) * 6) * dur / 60));
+        const miss = Math.round(hits * (100 / acc - 1));
+        const score = calcScore(hits, rt, miss, size, dur);
+        sess = { t, d: dayKey(new Date(t)), mode, size, dur, hits, miss, acc: Math.round(hits / (hits + miss) * 1000) / 10, rt, score };
+      }
 
       if (mode === 'ranked'){
         const oppRating = clamp(simRating + (Math.random() * 160 - 80), 300, 3000);
-        const bot = botStats(oppRating, dur, size);
-        const result = score > bot.score ? 'win' : score < bot.score ? 'loss' : 'draw';
+        const bot = cpsRun ? botCps(oppRating, dur) : botStats(oppRating, dur, size);
+        const result = sess.score > bot.score ? 'win' : sess.score < bot.score ? 'loss' : 'draw';
         const before = simRating;
         const after = eloUpdate(before, oppRating, result);
         sess.result = result; sess.botScore = bot.score; sess.oppRating = Math.round(oppRating);
@@ -1517,13 +1759,24 @@ function normalizeImported(raw){
   const s = { ...raw };
   s.mode = MODES[s.mode] ? s.mode : 'classic';
   s.size = SIZES[s.size] ? s.size : 'm';
-  s.dur = [30, 60].includes(s.dur) ? s.dur : 60;
+  s.dur = [30, 60].includes(s.dur) || ((s.disc === 'cps' || s.mode === 'cps') && [5, 10].includes(s.dur)) ? s.dur : 60;
   ['hits', 'miss', 'score', 'rt'].forEach(k => { if (typeof s[k] !== 'number' || !isFinite(s[k])) s[k] = 0; });
   if (typeof s.acc !== 'number' || !isFinite(s.acc)){
     s.acc = (s.hits + s.miss) ? Math.round(s.hits / (s.hits + s.miss) * 1000) / 10 : 0;
   }
+  const cpsRun = s.mode === 'cps' || s.disc === 'cps';
+  if (cpsRun){
+    s.disc = 'cps';
+    if (s.mode !== 'ranked') s.mode = 'cps';
+    s.dur = [5, 10, 30, 60].includes(s.dur) ? s.dur : 10;
+    ['clicks', 'cps', 'peak', 'cons'].forEach(k => { if (typeof s[k] !== 'number' || !isFinite(s[k])) s[k] = 0; });
+    if (!s.cps && s.clicks) s.cps = Math.round(s.clicks / s.dur * 100) / 100;
+    if (!s.clicks && s.cps) s.clicks = Math.round(s.cps * s.dur);
+    s.score = Math.round(s.clicks / s.dur * 100);
+    if (!Array.isArray(s.bins)) s.bins = [];
+  }
   if (s.mode === 'ranked' && (typeof s.ratingAfter !== 'number' || !['win', 'draw', 'loss'].includes(s.result))){
-    s.mode = 'classic'; // datos ranked incompletos: se conservan como sesión normal
+    s.mode = cpsRun ? 'cps' : 'classic'; // datos ranked incompletos: se conservan como sesión normal
   }
   return s;
 }
@@ -1580,13 +1833,3 @@ resize();
 </script>
 </body>
 </html>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-QG8EVKJYZT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-QG8EVKJYZT');
-</script>
