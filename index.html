@@ -269,6 +269,7 @@ button{font-family:inherit}
         <button class="chip" data-k="mode" data-v="classic" title="Un objetivo cada vez">Clásico</button>
         <button class="chip" data-k="mode" data-v="burst" title="Tres objetivos a la vez">Ráfaga</button>
         <button class="chip" data-k="mode" data-v="cps" title="Clics por segundo: entrena tu velocidad de clic">CPS</button>
+        <button class="chip" data-k="mode" data-v="react" title="Practica tu tiempo de reacción">Reflejos</button>
         <button class="chip" data-k="mode" data-v="ranked" title="Compite contra un bot de tu nivel, en puntería o en CPS">Ranked</button>
       </div>
       <div class="group" id="g-disc" role="group" aria-labelledby="l-disc" hidden>
@@ -293,6 +294,11 @@ button{font-family:inherit}
         <button class="chip" data-k="cdur" data-v="10">10 s</button>
         <button class="chip" data-k="cdur" data-v="30">30 s</button>
       </div>
+      <div class="group" id="g-rounds" role="group" aria-labelledby="l-rounds" hidden>
+        <span class="group-label" id="l-rounds">Rondas</span>
+        <button class="chip" data-k="rounds" data-v="5">5</button>
+        <button class="chip" data-k="rounds" data-v="10">10</button>
+      </div>
     </div>
 
     <p class="ranked-note" id="ranked-note" hidden></p>
@@ -301,7 +307,7 @@ button{font-family:inherit}
     <div class="hud">
       <div><span class="num" id="h-score">0</span><span class="cap" id="cap-score">puntos</span></div>
       <div class="bot" id="h-bot-wrap" hidden><span class="num" id="h-bot">0</span><span class="cap">bot</span></div>
-      <div><span class="num" id="h-time">30.0</span><span class="cap">segundos</span></div>
+      <div><span class="num" id="h-time">30.0</span><span class="cap" id="cap-time">segundos</span></div>
       <div><span class="num" id="h-acc">–</span><span class="cap" id="cap-acc">precisión</span></div>
     </div>
 
@@ -355,6 +361,7 @@ button{font-family:inherit}
         <button class="chip" data-k="metric" data-v="rt">Reacción</button>
         <button class="chip" data-k="metric" data-v="hits">Objetivos</button>
         <button class="chip" data-k="metric" data-v="cps">CPS</button>
+        <button class="chip" data-k="metric" data-v="react">Reflejos</button>
         <button class="chip" data-k="metric" data-v="rating">Ranked</button>
       </div>
       <div class="group" role="group" aria-labelledby="l-range">
@@ -432,10 +439,11 @@ sessions = sessions.filter(s => s && typeof s.t === 'number' && typeof s.d === '
 
 const cfgSaved = load(KEY_C, {});
 const cfg = {
-  mode: ['classic', 'burst', 'cps', 'ranked'].includes(cfgSaved.mode) ? cfgSaved.mode : 'classic',
+  mode: ['classic', 'burst', 'cps', 'react', 'ranked'].includes(cfgSaved.mode) ? cfgSaved.mode : 'classic',
   size: ['s', 'm', 'l'].includes(cfgSaved.size) ? cfgSaved.size : 'm',
   dur:  [30, 60].includes(cfgSaved.dur) ? cfgSaved.dur : 30,
   cdur: [5, 10, 30].includes(cfgSaved.cdur) ? cfgSaved.cdur : 10,
+  rounds: [5, 10].includes(cfgSaved.rounds) ? cfgSaved.rounds : 5,
   disc: ['aim', 'cps'].includes(cfgSaved.disc) ? cfgSaved.disc : 'aim',
   theme: ['pink','cyan','purple','lime','amber'].includes(cfgSaved.theme) ? cfgSaved.theme : 'pink',
   cursor: ['crosshair','dot','ring','plus'].includes(cfgSaved.cursor) ? cfgSaved.cursor : 'crosshair'
@@ -463,7 +471,7 @@ const COARSE = window.matchMedia && matchMedia('(pointer: coarse)').matches;
    Utilidades
    ========================================================= */
 let PINK = '#ff2ea6';
-const MODES = { classic: 'Clásico', burst: 'Ráfaga', cps: 'CPS', ranked: 'Ranked' };
+const MODES = { classic: 'Clásico', burst: 'Ráfaga', cps: 'CPS', react: 'Reflejos', ranked: 'Ranked' };
 const SIZE_NAMES = { s: 'pequeño', m: 'medio', l: 'grande' };
 const SIZES = {
   s: { f: 0.020, min: 13, mult: 1.4 },
@@ -512,6 +520,9 @@ function streak(g){
 }
 /* ---- CPS: ayudas ---- */
 const isCps = s => !!s && s.disc === 'cps';
+const isReact = s => !!s && s.disc === 'react';
+const isAim = s => !isCps(s) && !isReact(s);
+const reactLevel = ms => ms < 180 ? 'Élite' : ms < 220 ? 'Muy rápido' : ms < 270 ? 'Rápido' : ms < 350 ? 'Normal' : 'A calentar';
 const fmtCps = v => (Math.round(v * 10) / 10).toFixed(1).replace('.', ',');
 const cpsKind = () => cfg.mode === 'cps' || (cfg.mode === 'ranked' && cfg.disc === 'cps');
 const curDur = () => cpsKind() ? cfg.cdur : cfg.dur;
@@ -530,6 +541,11 @@ function cpsStats(times, D){
   const sd = Math.sqrt(bins.reduce((a, b) => a + (b - cps) * (b - cps), 0) / D);
   const cons = n ? clamp(Math.round((1 - sd / cps) * 100), 0, 100) : 0;
   return { clicks: n, cps: Math.round(cps * 100) / 100, peak, cons, bins };
+}
+function aggReact(list){
+  const rounds = list.reduce((a, s) => a + (s.rounds || 1), 0) || 1;
+  const avg = list.reduce((a, s) => a + (s.rt || 0) * (s.rounds || 1), 0) / rounds;
+  return { n: list.length, avg, best: Math.min(...list.map(s => s.best || Infinity)) };
 }
 function aggCps(list){
   const clicks = sum(list, 'clicks'), secs = sum(list, 'dur');
@@ -552,7 +568,9 @@ function levelFromXp(xp){
   return { level: lvl, into: rem, need };
 }
 function xpGain(s){
-  let base = isCps(s)
+  let base = isReact(s)
+    ? (s.rts || []).reduce((a, r) => a + Math.max(6, Math.round((600 - r) / 7)), 0)
+    : isCps(s)
     ? Math.round((s.clicks || 0) * 2.5)
     : Math.round(s.score / 9) + Math.round(s.hits * 0.85);
   if (s.mode === 'ranked'){
@@ -703,11 +721,11 @@ const ovRes = $('#ov-res');
 const settings = $('#settings');
 const hs = $('#h-score'), ht = $('#h-time'), ha = $('#h-acc');
 const hBotWrap = $('#h-bot-wrap'), hBot = $('#h-bot');
-const capScore = $('#cap-score'), capAcc = $('#cap-acc');
+const capScore = $('#cap-score'), capAcc = $('#cap-acc'), capTime = $('#cap-time');
 
 let W = 0, H = 0, dpr = 1, raf = 0;
 const G = { phase: 'idle', t0: 0, start: 0, end: 0, targets: [], fx: [], hits: 0, miss: 0, rtSum: 0, raw: 0, last: null, bot: null, botRating: null,
-  cps: false, dur: 30, cl: [], started: false, lastClick: 0 };
+  cps: false, dur: 30, cl: [], started: false, lastClick: 0, react: false, rx: null };
 
 try { document.fonts && document.fonts.load('600 64px Unbounded'); } catch (e) {}
 
@@ -735,6 +753,61 @@ function drawTarget(x, y, rad, alpha){
   ctx.fillStyle = PINK;
   ctx.beginPath(); ctx.arc(x, y, rad * 0.42, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
+}
+
+/* Arena de Reflejos: oscura mientras esperas, toda rosa cuando toca hacer clic. */
+function drawReact(now){
+  const x = G.rx, cx = W / 2, cy = H / 2;
+  const big = Math.min(96, H * 0.3);
+  const small = `500 ${Math.max(13, Math.min(18, W * 0.04))}px 'Hanken Grotesk', system-ui, sans-serif`;
+  const ink = '#12000a';
+  ctx.save();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  if (x.state === 'go'){
+    ctx.fillStyle = PINK; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = ink;
+    ctx.font = `700 ${big}px Unbounded, system-ui, sans-serif`;
+    ctx.fillText('¡YA!', cx, cy);
+  } else if (x.state === 'show'){
+    ctx.fillStyle = PINK; ctx.shadowColor = PINK; ctx.shadowBlur = 30;
+    ctx.font = `600 ${big}px Unbounded, system-ui, sans-serif`;
+    ctx.fillText(String(x.last), cx, cy - 8);
+    ctx.shadowBlur = 0; ctx.globalAlpha = 0.8; ctx.font = small;
+    ctx.fillText('milisegundos', cx, cy + big * 0.62);
+  } else if (x.state === 'early'){
+    ctx.fillStyle = '#ffd0e6';
+    ctx.font = `600 ${Math.min(34, H * 0.1)}px Unbounded, system-ui, sans-serif`;
+    ctx.fillText('Demasiado pronto', cx, cy - 10);
+    ctx.globalAlpha = 0.75; ctx.font = small;
+    ctx.fillText('Espera a que se ponga rosa', cx, cy + 34);
+  } else {
+    ctx.strokeStyle = PINK; ctx.lineWidth = 4; ctx.globalAlpha = 0.3;
+    ctx.beginPath(); ctx.arc(cx, cy - 6, Math.min(W, H) * 0.17, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = 0.85; ctx.fillStyle = PINK;
+    ctx.font = `600 ${Math.min(30, H * 0.1)}px Unbounded, system-ui, sans-serif`;
+    ctx.fillText('Espera…', cx, cy - 6);
+    ctx.globalAlpha = 0.7; ctx.font = small;
+    ctx.fillText('Haz clic en cuanto se ponga rosa', cx, cy + Math.min(W, H) * 0.17 + 28);
+  }
+  // puntos de progreso de las rondas
+  const gap = 20, y = H - 26, x0 = cx - (x.n - 1) * gap / 2;
+  const col = x.state === 'go' ? ink : PINK;
+  ctx.globalAlpha = 1; ctx.shadowBlur = 0; ctx.fillStyle = col; ctx.strokeStyle = col; ctx.lineWidth = 2;
+  for (let i = 0; i < x.n; i++){
+    ctx.beginPath(); ctx.arc(x0 + i * gap, y, 5, 0, Math.PI * 2);
+    if (i < x.done) ctx.fill(); else { ctx.globalAlpha = 0.45; ctx.stroke(); ctx.globalAlpha = 1; }
+  }
+  ctx.restore();
+}
+
+function stepReact(now){
+  const x = G.rx;
+  if (x.state === 'wait' && now >= x.tNext){ x.state = 'go'; x.tGo = now; }
+  else if ((x.state === 'show' || x.state === 'early') && now >= x.tUntil){
+    if (x.state === 'show' && x.done >= x.n){ finish(); return true; }
+    x.state = 'wait'; x.tNext = now + 1200 + Math.random() * 2600;
+  }
+  return false;
 }
 
 /* Arena de CPS: un anillo que late con cada clic y un arco que marca el tiempo restante. */
@@ -801,6 +874,7 @@ function draw(now){
     return;
   }
   if (G.phase === 'play'){
+    if (G.react){ drawReact(now); return; }
     if (G.cps) drawCps(now);
     for (const t of G.targets){
       const k = RM ? 1 : Math.min(1, (now - t.born) / 140);
@@ -862,6 +936,18 @@ function updateHud(now){
   const idle = G.phase === 'idle';
   const D = idle ? curDur() : G.dur;
   const isC = idle ? cpsKind() : G.cps;
+  const isR = idle ? cfg.mode === 'react' : G.react;
+  setText(capTime, isR ? 'rondas' : 'segundos');
+  if (isR){
+    const x = G.rx;
+    const n = x ? x.n : cfg.rounds, done = x ? x.done : 0;
+    setText(capScore, 'media (ms)'); setText(capAcc, 'mejor (ms)');
+    setText(hs, done ? nf(Math.round(x.rts.reduce((a, b) => a + b, 0) / done)) : '–');
+    setText(ht, `${done}/${n}`);
+    setText(ha, done ? nf(Math.min(...x.rts)) : '–');
+    hBotWrap.hidden = true;
+    return;
+  }
   setText(capScore, isC ? 'clics' : 'puntos');
   setText(capAcc, isC ? 'CPS' : 'precisión');
   let left = D;
@@ -889,7 +975,10 @@ function updateHud(now){
 function tick(now){
   if (G.phase === 'countdown' && now - G.t0 >= 1500){
     G.phase = 'play';
-    if (G.cps){
+    if (G.react){
+      G.start = now; G.end = Infinity;
+      G.rx.state = 'wait'; G.rx.tNext = now + 1200 + Math.random() * 2600;
+    } else if (G.cps){
       // en CPS el reloj arranca con el primer clic
       G.start = 0; G.end = Infinity; G.started = false;
     } else {
@@ -902,6 +991,7 @@ function tick(now){
     finish();
     return;
   }
+  if (G.phase === 'play' && G.react && stepReact(now)) return;
   draw(now);
   updateHud(now);
   if (G.phase === 'countdown' || G.phase === 'play') raf = requestAnimationFrame(tick);
@@ -919,6 +1009,8 @@ function startGame(){
     phase: 'countdown', t0: performance.now(), targets: [], fx: [],
     hits: 0, miss: 0, rtSum: 0, raw: 0, last: null,
     cps: kindCps, dur: D, cl: [], started: false, lastClick: 0,
+    react: cfg.mode === 'react',
+    rx: cfg.mode === 'react' ? { n: cfg.rounds, done: 0, rts: [], early: 0, state: 'wait', tNext: 0, tUntil: 0, tGo: 0, last: 0 } : null,
     bot: bot ? bot.stats : null, botRating: bot ? bot.rating : null
   });
   ovIdle.hidden = true;
@@ -930,7 +1022,7 @@ function startGame(){
 
 function cancelGame(){
   cancelAnimationFrame(raf);
-  Object.assign(G, { phase: 'idle', targets: [], fx: [], hits: 0, miss: 0, rtSum: 0, raw: 0, last: null, bot: null, botRating: null, cps: false, cl: [], started: false, lastClick: 0 });
+  Object.assign(G, { phase: 'idle', targets: [], fx: [], hits: 0, miss: 0, rtSum: 0, raw: 0, last: null, bot: null, botRating: null, cps: false, cl: [], started: false, lastClick: 0, react: false, rx: null });
   ovIdle.hidden = false;
   ovRes.hidden = true;
   settings.removeAttribute('inert');
@@ -944,7 +1036,19 @@ function finish(){
   const D = G.dur;
   let s, tot, record = false;
 
-  if (G.cps){
+  if (G.react){
+    const x = G.rx, rts = x.rts.slice();
+    tot = rts.length;
+    const avg = Math.round(rts.reduce((a, b) => a + b, 0) / Math.max(1, rts.length));
+    const prevBest = sessions.reduce((m, y) => isReact(y) && y.rounds === x.n && y.rt > 0 ? Math.min(m, y.rt) : m, Infinity);
+    record = prevBest !== Infinity && avg < prevBest;
+    s = {
+      t: Date.now(), d: dayKey(new Date()),
+      mode: 'react', size: cfg.size, dur: 0, disc: 'react',
+      hits: 0, miss: 0, acc: 0, score: 0,
+      rt: avg, rounds: x.n, rts, best: Math.min(...rts), worst: Math.max(...rts), early: x.early
+    };
+  } else if (G.cps){
     const st = cpsStats(G.cl, D);
     tot = st.clicks;
     const prevBest = sessions.reduce((m, x) => isCps(x) && x.dur === D ? Math.max(m, x.cps || 0) : m, 0);
@@ -1000,7 +1104,8 @@ function finish(){
 function showResults(s, saved, gained, levelAfter, leveledUp, ranked, record){
   ovIdle.hidden = true;
   ovRes.hidden = false;
-  const isC = isCps(s);
+  const isC = isCps(s), isR = isReact(s);
+  const recLabel = isR ? 'Nuevo récord de reacción' : 'Nuevo récord de CPS';
   const recBadge = record && !ranked;
   const lvlBadge = leveledUp && !ranked && !recBadge;
   const lvlNote = leveledUp && !lvlBadge;
@@ -1023,7 +1128,22 @@ function showResults(s, saved, gained, levelAfter, leveledUp, ranked, record){
   }
 
   let mainBlock;
-  if (isC){
+  if (isR){
+    const rts = s.rts || [];
+    const mx = Math.max(1, ...rts);
+    const barsHtml = rts.length
+      ? `<div class="res-bins" role="img" aria-label="Tiempo de cada ronda en milisegundos: ${rts.join(', ')}">${rts.map((b, i) => `<i style="height:${Math.max(10, Math.round(b / mx * 100))}%" title="Ronda ${i + 1}: ${b} ms"></i>`).join('')}</div>`
+      : '';
+    mainBlock = `
+    <div class="res-score">${nf(s.rt)}</div>
+    <p class="res-unit">ms de media · ${reactLevel(s.rt)}</p>
+    ${barsHtml}
+    <dl class="res-stats">
+      <div><dt>mejor</dt><dd>${nf(s.best)}\u00a0ms</dd></div>
+      <div><dt>peor</dt><dd>${nf(s.worst)}\u00a0ms</dd></div>
+      <div><dt>salidas en falso</dt><dd>${s.early}</dd></div>
+    </dl>`;
+  } else if (isC){
     const bins = Array.isArray(s.bins) ? s.bins : [];
     const mx = Math.max(1, ...bins);
     const binsHtml = bins.length
@@ -1051,7 +1171,7 @@ function showResults(s, saved, gained, levelAfter, leveledUp, ranked, record){
   }
 
   ovRes.innerHTML = `
-    ${recBadge ? '<p class="res-badge">Nuevo récord de CPS</p>' : ''}
+    ${recBadge ? `<p class="res-badge">${recLabel}</p>` : ''}
     ${lvlBadge ? `<p class="res-badge">Subiste al nivel ${levelAfter}</p>` : ''}
     ${rankedBlock}
     ${mainBlock}
@@ -1060,7 +1180,7 @@ function showResults(s, saved, gained, levelAfter, leveledUp, ranked, record){
       <button class="btn primary" id="again" type="button" disabled>Jugar otra vez</button>
       <button class="btn" id="see-charts" type="button">Ver gráficas</button>
     </div>
-    <p class="res-note">${saved ? `Sesión guardada en tu calendario.${record && ranked ? ' Nuevo récord de CPS.' : ''}` : 'No se guardó la sesión porque no hubo ningún clic.'}</p>`;
+    <p class="res-note">${saved ? `Sesión guardada en tu calendario.${record && ranked ? ` ${recLabel}.` : ''}` : 'No se guardó la sesión porque no hubo ningún clic.'}</p>`;
   const again = $('#again');
   again.addEventListener('click', startGame);
   $('#see-charts').addEventListener('click', () => setView('charts'));
@@ -1074,6 +1194,19 @@ canvas.addEventListener('pointerdown', e => {
   const rect = canvas.getBoundingClientRect();
   const px = e.clientX - rect.left, py = e.clientY - rect.top;
   const now = performance.now();
+
+  if (G.react){
+    const x = G.rx;
+    const tEv = e.timeStamp > 0 && e.timeStamp <= now ? e.timeStamp : now;
+    if (x.state === 'wait'){
+      x.early++; x.state = 'early'; x.tUntil = now + 1300;
+    } else if (x.state === 'go'){
+      const rt = Math.round(tEv - x.tGo);
+      if (rt < 100){ x.early++; x.state = 'early'; x.tUntil = now + 1300; }   // anticipación: no es humano
+      else { x.rts.push(rt); x.done++; x.last = rt; x.state = 'show'; x.tUntil = now + (x.done >= x.n ? 1000 : 1100); }
+    }
+    return;
+  }
 
   if (G.cps){
     if (!G.started){ G.started = true; G.start = now; G.end = now + G.dur * 1000; }
@@ -1127,6 +1260,7 @@ new ResizeObserver(() => resize()).observe($('.arena'));
 
 function updateIdleText(){
   const kind = cpsKind();
+  const rx = cfg.mode === 'react';
   const D = curDur();
   const note = $('#ranked-note'), ladder = $('#ranked-ladder');
   $('#idle-title').textContent = COARSE ? 'Toca para empezar' : 'Haz clic para empezar';
@@ -1142,16 +1276,19 @@ function updateIdleText(){
   } else {
     $('#idle-sub').textContent = cfg.mode === 'cps'
       ? `CPS, ${D} s. El tiempo empieza con tu primer clic`
+      : rx
+      ? `Reflejos, ${cfg.rounds} rondas. Cuando la arena se ponga rosa, haz clic lo más rápido que puedas`
       : `${MODES[cfg.mode]}, tamaño ${SIZE_NAMES[cfg.size]}, ${cfg.dur} s`;
     note.hidden = true;
     ladder.hidden = true;
   }
   hBotWrap.hidden = cfg.mode !== 'ranked';
   $('#g-disc').hidden = cfg.mode !== 'ranked';
-  $('#g-size').hidden = kind;
-  $('#g-dur').hidden = kind;
+  $('#g-size').hidden = kind || rx;
+  $('#g-dur').hidden = kind || rx;
+  $('#g-rounds').hidden = !rx;
   $('#g-cdur').hidden = !kind;
-  canvas.setAttribute('aria-label', kind
+  canvas.setAttribute('aria-label', rx ? 'Zona de reflejos: haz clic en cuanto la arena se ponga rosa' : kind
     ? 'Zona de CPS: haz clic donde quieras, lo más rápido que puedas'
     : 'Zona de entrenamiento: haz clic en los objetivos rosas');
 }
@@ -1159,13 +1296,14 @@ function updateIdleText(){
 function renderToday(){
   const g = groupByDay();
   const list = g.get(dayKey(new Date())) || [];
-  const aim = list.filter(s => !isCps(s)), cp = list.filter(isCps);
+  const aim = list.filter(isAim), cp = list.filter(isCps), rx = list.filter(isReact);
   let txt;
   if (!list.length) txt = 'Aún no has entrenado hoy.';
   else {
     txt = `Hoy llevas ${plural(list.length, 'sesión', 'sesiones')}`;
     txt += aim.length ? ` y tu mejor puntuación es ${nf(Math.max(...aim.map(s => s.score)))}.` : '.';
     if (cp.length) txt += ` Tu mejor ritmo de clics es ${fmtCps(Math.max(...cp.map(s => s.cps || 0)))}\u00a0CPS.`;
+    if (rx.length) txt += ` Tu mejor reacción media es ${nf(Math.min(...rx.map(s => s.rt || Infinity)))}\u00a0ms.`;
   }
   const st = streak(g);
   if (st > 1) txt += ` Racha de ${st} días.`;
@@ -1222,22 +1360,23 @@ function renderDetail(){
     h += `<p class="muted">No hay sesiones este día.</p>`;
     if (selDay === todayK) h += `<button class="btn primary" id="detail-go" type="button">Entrenar ahora</button>`;
   } else {
-    const aimL = list.filter(x => !isCps(x)), cpsL = list.filter(isCps);
+    const aimL = list.filter(isAim), cpsL = list.filter(isCps), rxL = list.filter(isReact);
     let summary = plural(list.length, 'sesión', 'sesiones') + '.';
     if (aimL.length){ const a = agg(aimL); summary += ` Mejor puntuación ${nf(a.best)} y precisión media del ${Math.round(a.acc)}\u00a0%.`; }
     if (cpsL.length) summary += ` Mejor ritmo de clics: ${fmtCps(Math.max(...cpsL.map(x => x.cps || 0)))}\u00a0CPS.`;
+    if (rxL.length) summary += ` Mejor reacción media: ${nf(Math.min(...rxL.map(x => x.rt || Infinity)))}\u00a0ms.`;
     h += `<p class="muted">${summary}</p><ul class="sess">`;
     for (const s of list){
       const time = new Date(s.t).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
       const tag = s.mode === 'ranked'
         ? `<span class="tag${s.result === 'win' ? ' win' : ''}">${s.result === 'win' ? 'victoria' : s.result === 'draw' ? 'empate' : 'derrota'}${s.delta != null ? ` ${s.delta > 0 ? '+' : ''}${s.delta}` : ''}</span>`
         : '';
-      const c = isCps(s);
-      const title = c
+      const c = isCps(s), rx = isReact(s);
+      const title = rx ? `Reflejos, ${plural(s.rounds || (s.rts || []).length, 'ronda', 'rondas')}` : c
         ? `${MODES[s.mode] || s.mode}${s.mode === 'ranked' ? ' CPS' : ''}, ${s.dur} s`
         : `${MODES[s.mode] || s.mode}, ${SIZE_NAMES[s.size] || s.size}, ${s.dur} s`;
-      const val = c ? `${fmtCps(s.cps || 0)}\u00a0CPS` : nf(s.score);
-      const meta = c
+      const val = rx ? `${nf(s.rt)}\u00a0ms` : c ? `${fmtCps(s.cps || 0)}\u00a0CPS` : nf(s.score);
+      const meta = rx ? `mejor ${nf(s.best || 0)}\u00a0ms, peor ${nf(s.worst || 0)}\u00a0ms, ${plural(s.early || 0, 'salida en falso', 'salidas en falso')}` : c
         ? `${plural(s.clicks || 0, 'clic', 'clics')}, mejor segundo ${s.peak || 0}, constancia del ${s.cons || 0}\u00a0%`
         : `${plural(s.hits, 'objetivo', 'objetivos')}, ${Math.round(s.acc)}\u00a0% de precisión${s.hits ? `, ${s.rt}\u00a0ms de reacción` : ''}`;
       h += `<li>
@@ -1299,6 +1438,11 @@ const METRICS = {
     fmt: v => `${fmtCps(v)}\u00a0CPS`, axis: v => String(+v.toFixed(1)).replace('.', ','), big: v => [fmtCps(v), 'CPS'],
     cap: N => `de clics por segundo de media en los últimos ${N} días`
   },
+  react: {
+    label: 'Reflejos', only: 'react', get: a => a.avg, sess: s => s.rt, better: 'down',
+    fmt: v => `${nf(v)}\u00a0ms`, axis: v => nf(v), big: v => [nf(v), 'ms'],
+    cap: N => `de reacción media en el modo Reflejos en los últimos ${N} días`
+  },
   rating: {
     label: 'Ranked', kind: 'rating', sess: null, better: 'up',
     fmt: v => `${nf(v)}\u00a0Elo`, axis: v => nf(v), big: v => [nf(v), 'elo'],
@@ -1312,13 +1456,13 @@ function dailyVals(endDate, N, M){
   for (let i = N - 1; i >= 0; i--){
     const d = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - i);
     const raw = g.get(dayKey(d)) || [];
-    const list = M.only === 'cps' ? raw.filter(isCps) : M.only === 'aim' ? raw.filter(x => !isCps(x)) : raw;
+    const list = M.only === 'cps' ? raw.filter(isCps) : M.only === 'react' ? raw.filter(isReact) : M.only === 'aim' ? raw.filter(isAim) : raw;
     let v = null, a = null;
     if (M.kind === 'rating'){
       const rl = list.filter(s => s.mode === 'ranked' && s.ratingAfter != null).sort((x, y) => x.t - y.t);
       if (rl.length) v = rl[rl.length - 1].ratingAfter;
     } else {
-      a = list.length ? (M.only === 'cps' ? aggCps(list) : agg(list)) : null;
+      a = list.length ? (M.only === 'cps' ? aggCps(list) : M.only === 'react' ? aggReact(list) : agg(list)) : null;
       v = a ? M.get(a) : null;
     }
     out.push({ d, list, a, v });
@@ -1367,6 +1511,8 @@ function renderCharts(){
     capEl.textContent = isRating ? 'Aún no has jugado en modo ranked.' : 'Sin datos en este periodo.';
     $('#chart-empty-txt').innerHTML = isRating
       ? 'No hay partidas ranked en este periodo.<br>Juega contra un bot (puntería o CPS) para ver tu progreso de rango.'
+      : chartMetric === 'react'
+        ? 'No hay sesiones de Reflejos en este periodo.<br>Prueba el modo Reflejos para ver tu tiempo de reacción día a día.'
       : chartMetric === 'cps'
         ? 'No hay sesiones de CPS en este periodo.<br>Prueba el modo CPS para ver tu velocidad de clic día a día.'
         : 'No hay sesiones en este periodo.<br>Entrena una para ver tu evolución día a día.';
@@ -1562,7 +1708,7 @@ function syncChips(){
   $$('.chip[data-k]').forEach(c => {
     const k = c.dataset.k;
     const cur = k === 'mode' ? cfg.mode : k === 'size' ? cfg.size : k === 'dur' ? String(cfg.dur)
-              : k === 'cdur' ? String(cfg.cdur) : k === 'disc' ? cfg.disc
+              : k === 'cdur' ? String(cfg.cdur) : k === 'rounds' ? String(cfg.rounds) : k === 'disc' ? cfg.disc
               : k === 'metric' ? chartMetric : String(chartRange);
     c.setAttribute('aria-pressed', String(c.dataset.v === cur));
   });
@@ -1571,8 +1717,8 @@ document.addEventListener('click', e => {
   const c = e.target.closest('.chip[data-k]');
   if (!c) return;
   const k = c.dataset.k, v = c.dataset.v;
-  if (k === 'mode' || k === 'size' || k === 'dur' || k === 'cdur' || k === 'disc' || k === 'theme' || k === 'cursor'){
-    cfg[k] = (k === 'dur' || k === 'cdur') ? Number(v) : v;
+  if (k === 'mode' || k === 'size' || k === 'dur' || k === 'cdur' || k === 'rounds' || k === 'disc' || k === 'theme' || k === 'cursor'){
+    cfg[k] = (k === 'dur' || k === 'cdur' || k === 'rounds') ? Number(v) : v;
     save(KEY_C, cfg);
     if (k === 'theme' || k === 'cursor') applyAppearance();
     if (G.phase === 'done') cancelGame();
@@ -1629,6 +1775,17 @@ function refreshAll(){
   if (view === 'charts'){ activeIdx = null; renderCharts(); }
 }
 
+/* Sesión de Reflejos simulada para los datos de ejemplo. */
+function simReact(n, trend){
+  const base = 300 - trend * 55 + (Math.random() - 0.5) * 30;
+  const rts = [];
+  for (let i = 0; i < n; i++){
+    const slip = Math.random() < 0.12 ? 80 + Math.random() * 120 : 0;
+    rts.push(Math.round(clamp(base + (Math.random() - 0.5) * 90 + slip, 150, 900)));
+  }
+  return { rt: Math.round(rts.reduce((a, b) => a + b, 0) / n), rounds: n, rts, best: Math.min(...rts), worst: Math.max(...rts), early: Math.random() < 0.25 ? 1 : 0 };
+}
+
 /* Sesión de CPS simulada para los datos de ejemplo (con algo de fatiga y ruido). */
 function simCps(dur, trend){
   const f = d => 1.12 - 0.07 * Math.log2(d / 5);
@@ -1654,7 +1811,7 @@ $('#btn-sample').addEventListener('click', () => {
     const n = 1 + Math.floor(Math.random() * 3.6);
     for (let k = 0; k < n; k++){
       const r = Math.random();
-      const mode = r < 0.36 ? 'ranked' : r < 0.62 ? 'classic' : r < 0.82 ? 'burst' : 'cps';
+      const mode = r < 0.32 ? 'ranked' : r < 0.55 ? 'classic' : r < 0.72 ? 'burst' : r < 0.87 ? 'cps' : 'react';
       const cpsRun = mode === 'cps' || (mode === 'ranked' && Math.random() < 0.35);
       const rs = Math.random();
       const size = rs < 0.2 ? 's' : rs < 0.85 ? 'm' : 'l';
@@ -1663,7 +1820,10 @@ $('#btn-sample').addEventListener('click', () => {
       if (i === 0) t = Math.min(t, Date.now() - (n - k) * 60000);
 
       let dur, sess;
-      if (cpsRun){
+      if (mode === 'react'){
+        dur = 0;
+        sess = { t, d: dayKey(new Date(t)), mode, size, dur, disc: 'react', hits: 0, miss: 0, acc: 0, score: 0, ...simReact(Math.random() < 0.6 ? 5 : 10, trend) };
+      } else if (cpsRun){
         dur = [5, 10, 10, 30][Math.floor(Math.random() * 4)];
         sess = { t, d: dayKey(new Date(t)), mode, size, dur, disc: 'cps', hits: 0, miss: 0, acc: 0, rt: 0, ...simCps(dur, trend) };
         sess.score = Math.round(sess.clicks / dur * 100);
@@ -1763,6 +1923,17 @@ function normalizeImported(raw){
   ['hits', 'miss', 'score', 'rt'].forEach(k => { if (typeof s[k] !== 'number' || !isFinite(s[k])) s[k] = 0; });
   if (typeof s.acc !== 'number' || !isFinite(s.acc)){
     s.acc = (s.hits + s.miss) ? Math.round(s.hits / (s.hits + s.miss) * 1000) / 10 : 0;
+  }
+  if (s.mode === 'react' || s.disc === 'react'){
+    s.disc = 'react'; s.mode = 'react'; s.dur = 0;
+    s.rts = Array.isArray(s.rts) ? s.rts.filter(v => typeof v === 'number' && isFinite(v) && v > 0) : [];
+    ['rounds', 'best', 'worst', 'early'].forEach(k => { if (typeof s[k] !== 'number' || !isFinite(s[k])) s[k] = 0; });
+    if (!s.rounds) s.rounds = s.rts.length || 5;
+    if (!s.rt && s.rts.length) s.rt = Math.round(s.rts.reduce((a, b) => a + b, 0) / s.rts.length);
+    if (!s.best && s.rts.length) s.best = Math.min(...s.rts);
+    if (!s.worst && s.rts.length) s.worst = Math.max(...s.rts);
+    s.hits = 0; s.miss = 0; s.acc = 0; s.score = 0;
+    return s;
   }
   const cpsRun = s.mode === 'cps' || s.disc === 'cps';
   if (cpsRun){
