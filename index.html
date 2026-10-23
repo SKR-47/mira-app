@@ -210,6 +210,111 @@ button{font-family:inherit}
   .tab{font-size:.88rem}
   .day{padding:5px 6px;font-size:.85rem}
 }
+
+/* ---------- actualización de interfaz (v2.2) ---------- */
+body{background:radial-gradient(70% 420px at 50% 0,rgb(var(--pink-rgb) / .12),transparent 72%) no-repeat,var(--bg)}
+.chip,.btn,.day,.tabs .tab{transition:background .15s,color .15s,border-color .15s,box-shadow .2s,transform .15s}
+
+/* cabecera */
+.top{background:rgb(0 0 0 / .72);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2)}
+.brand{display:flex;align-items:center;gap:9px}
+.brand .logo{flex:none;filter:drop-shadow(0 0 6px rgb(var(--pink-rgb) / .75))}
+.tabs{gap:2px;padding:3px;border:1px solid var(--line-soft);border-radius:999px;background:rgb(var(--pink-rgb) / .05)}
+.tabs .tab{padding:7px 16px;border-bottom:0;border-radius:999px}
+.tabs .tab:hover{background:rgb(var(--pink-rgb) / .09)}
+.tabs .tab[aria-selected="true"]{background:rgb(var(--pink-rgb) / .18);color:var(--pink);box-shadow:inset 0 0 0 1px rgb(var(--pink-rgb) / .38)}
+.profile{background:rgb(var(--pink-rgb) / .04)}
+
+/* controles */
+.settings{flex-direction:column;flex-wrap:nowrap;gap:12px;margin-bottom:22px}
+.modes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.chip.mode{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-height:96px;padding:14px 14px 13px;text-align:left;white-space:normal;border-radius:16px;background:rgb(var(--pink-rgb) / .035)}
+.chip.mode svg{width:24px;height:24px;margin-bottom:8px;flex:none}
+.chip.mode:hover{transform:translateY(-2px);background:rgb(var(--pink-rgb) / .08)}
+.m-name{font:500 .98rem/1.15 var(--display);letter-spacing:-.02em}
+.m-desc{font-size:.78rem;line-height:1.3;color:var(--muted)}
+.chip.mode[aria-pressed="true"]{background:var(--pink);color:#000;box-shadow:0 10px 30px -8px rgb(var(--pink-rgb) / .65)}
+.chip.mode[aria-pressed="true"] .m-desc{color:rgb(0 0 0 / .72)}
+.opts{display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px;padding:10px 14px;border:1px solid var(--line-soft);border-radius:16px;background:rgb(var(--pink-rgb) / .03)}
+.seg{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px;background:#000}
+.seg .chip{padding:5px 14px;border-color:transparent;background:transparent;z-index:auto}
+.seg .chip:hover{border-color:transparent;background:rgb(var(--pink-rgb) / .14)}
+.seg .chip[aria-pressed="true"]{background:var(--pink);color:#000;box-shadow:0 0 14px -2px rgb(var(--pink-rgb) / .6)}
+.chart-controls{align-items:center}
+
+/* marcador */
+.hud{grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:12px;margin-bottom:14px}
+.hud>div{flex-direction:column-reverse;gap:2px;padding:12px 16px 11px;border:1px solid var(--line-soft);border-radius:16px;background:rgb(var(--pink-rgb) / .04)}
+.hud .num{font-size:clamp(1.5rem,4.6vw,2.2rem)}
+.hud .cap{font-size:.78rem;letter-spacing:.02em}
+.hud .bot{border-color:var(--line);background:rgb(255 255 255 / .04)}
+
+/* arena */
+.arena{border-radius:20px;border-color:var(--line);background:
+  radial-gradient(120% 80% at 50% 0,rgb(var(--pink-rgb) / .10),transparent 62%),
+  radial-gradient(rgb(var(--pink-rgb) / .13) 1px,transparent 1.5px) 0 0/30px 30px,
+  #000;
+  box-shadow:0 30px 70px -40px rgb(var(--pink-rgb) / .55),inset 0 0 70px rgb(var(--pink-rgb) / .05)}
+.idle-title{display:inline-flex;align-items:center;padding:12px 26px;border:1px solid var(--pink);border-radius:999px;background:rgb(var(--pink-rgb) / .12);box-shadow:0 0 30px -6px rgb(var(--pink-rgb) / .6);transition:background .15s,color .15s,transform .15s}
+.idle-title::before{content:"";display:inline-block;width:9px;height:11px;margin-right:11px;background:currentColor;clip-path:polygon(0 0,100% 50%,0 100%)}
+.ov-idle:hover .idle-title{background:var(--pink);color:#000;transform:translateY(-1px)}
+.idle-sub{max-width:46ch;margin-top:4px}
+
+/* resultados */
+.ov-res{background:radial-gradient(90% 70% at 50% 40%,rgb(var(--pink-rgb) / .13),transparent 70%),rgb(0 0 0 / .93);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.res-badge{background:rgb(var(--pink-rgb) / .12);box-shadow:0 0 22px -6px rgb(var(--pink-rgb) / .7)}
+.res-stats{gap:10px}
+.res-stats>div{min-width:96px;padding:10px 18px;border:1px solid var(--line-soft);border-radius:14px;background:rgb(var(--pink-rgb) / .05)}
+.res-vs{gap:14px}
+.res-vs .side{min-width:90px;padding:10px 16px;border:1px solid var(--line-soft);border-radius:14px;background:rgb(var(--pink-rgb) / .05)}
+.res-bins{padding:0 2px}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.ov-res>*{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+.ov-res>:nth-child(2){animation-delay:.05s}.ov-res>:nth-child(3){animation-delay:.1s}.ov-res>:nth-child(4){animation-delay:.15s}
+.ov-res>:nth-child(5){animation-delay:.2s}.ov-res>:nth-child(6){animation-delay:.25s}.ov-res>:nth-child(7){animation-delay:.3s}
+.today{padding:12px 16px;border:1px solid var(--line-soft);border-radius:14px;background:rgb(var(--pink-rgb) / .03)}
+
+/* calendario */
+.day{border-radius:12px}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.facts>div{padding:12px 16px;border:1px solid var(--line-soft);border-radius:16px;background:rgb(var(--pink-rgb) / .04)}
+.facts .num{font-size:clamp(1.4rem,4vw,1.9rem)}
+.sess{display:grid;gap:10px}
+.sess li{padding:14px 16px;border:1px solid var(--line-soft);border-radius:14px;background:rgb(var(--pink-rgb) / .03)}
+
+/* gráficas */
+.chart-card{padding:clamp(16px,3vw,28px);border:1px solid var(--line-soft);border-radius:20px;background:linear-gradient(180deg,rgb(var(--pink-rgb) / .06),transparent 55%)}
+.chart-card .chart-summary{margin-bottom:18px}
+
+@media (max-width:760px){
+  .modes{display:flex;overflow-x:auto;scroll-snap-type:x proximity;gap:10px;margin:0 calc(-1 * clamp(16px,4vw,32px));padding:6px clamp(16px,4vw,32px) 10px;scrollbar-width:none}
+  .modes::-webkit-scrollbar{display:none}
+  .chip.mode{flex:0 0 148px;min-height:88px;scroll-snap-align:start}
+  .opts{gap:10px 18px}
+}
+@media (max-width:420px){
+  .tabs{gap:2px}
+  .tabs .tab{padding:7px 12px}
+  .facts .num{font-size:1.35rem}
+  .facts>div{padding:10px 12px}
+}
+
+/* ajustes de cabecera y móvil */
+.top .bar{padding-left:clamp(16px,4vw,32px);padding-right:clamp(16px,4vw,32px)}
+.modes{scroll-padding-inline:clamp(16px,4vw,32px)}
+@media (max-width:640px){
+  .top .bar{gap:10px 12px}
+  .brandrow{display:contents}
+  .brand{order:1}
+  .settings-toggle{order:2;margin-left:auto}
+  .tabs{order:3;width:100%}
+  .tabs .tab{flex:1;text-align:center}
+  .profile{order:4}
+  .hud{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .hud:has(#h-bot-wrap:not([hidden])){grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hud>div{padding:10px 12px}
+  .hud .num{font-size:1.45rem}
+}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition:none!important;animation:none!important}
 }
@@ -220,7 +325,7 @@ button{font-family:inherit}
 <header class="top">
   <div class="wrap bar">
     <div class="brandrow">
-      <div class="brand">mira</div>
+      <div class="brand"><svg class="logo" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4"/></svg>mira</div>
       <nav class="tabs" role="tablist" aria-label="Secciones">
         <button class="tab" role="tab" id="tab-train" data-view="train" aria-selected="true" aria-controls="view-train">Entrenar</button>
         <button class="tab" role="tab" id="tab-cal" data-view="cal" aria-selected="false" aria-controls="view-cal" tabindex="-1">Calendario</button>
@@ -264,40 +369,51 @@ button{font-family:inherit}
   <!-- ENTRENAR -->
   <section class="view" id="view-train" role="tabpanel" aria-labelledby="tab-train">
     <div class="settings" id="settings">
-      <div class="group" role="group" aria-labelledby="l-mode">
-        <span class="group-label" id="l-mode">Modo</span>
-        <button class="chip" data-k="mode" data-v="classic" title="Un objetivo cada vez">Clásico</button>
-        <button class="chip" data-k="mode" data-v="burst" title="Tres objetivos a la vez">Ráfaga</button>
-        <button class="chip" data-k="mode" data-v="cps" title="Clics por segundo: entrena tu velocidad de clic">CPS</button>
-        <button class="chip" data-k="mode" data-v="react" title="Practica tu tiempo de reacción">Reflejos</button>
-        <button class="chip" data-k="mode" data-v="ranked" title="Compite contra un bot de tu nivel, en puntería o en CPS">Ranked</button>
+      <div class="modes" role="group" aria-label="Modo de juego">
+        <button class="chip mode" data-k="mode" data-v="classic" title="Un objetivo cada vez"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".9" fill="currentColor"/></svg><span class="m-name">Clásico</span><span class="m-desc">Un objetivo cada vez</span></button>
+        <button class="chip mode" data-k="mode" data-v="burst" title="Tres objetivos a la vez"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="8" r="3"/><circle cx="17" cy="9" r="3"/><circle cx="11.5" cy="17" r="3"/></svg><span class="m-name">Ráfaga</span><span class="m-desc">Tres a la vez</span></button>
+        <button class="chip mode" data-k="mode" data-v="cps" title="Clics por segundo: entrena tu velocidad de clic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3.5l10 7.2-4.6 1 2.8 5.6-2.3 1.2-2.8-5.6-3.3 3.2z"/><path d="M3.5 7.5h2M3 11h2.6"/></svg><span class="m-name">CPS</span><span class="m-desc">Clics por segundo</span></button>
+        <button class="chip mode" data-k="mode" data-v="react" title="Practica tu tiempo de reacción"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2.5L5 13.5h6l-1 8 8-11h-6z"/></svg><span class="m-name">Reflejos</span><span class="m-desc">Tu tiempo de reacción</span></button>
+        <button class="chip mode" data-k="mode" data-v="ranked" title="Compite contra un bot de tu nivel, en puntería o en CPS"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5.5a4 4 0 0 1-8 0z"/><path d="M8 6H4.5A3.2 3.2 0 0 0 8 10.5M16 6h3.5A3.2 3.2 0 0 1 16 10.5M12 13.5V17M8.5 20h7"/></svg><span class="m-name">Ranked</span><span class="m-desc">Duelo contra un bot</span></button>
       </div>
-      <div class="group" id="g-disc" role="group" aria-labelledby="l-disc" hidden>
-        <span class="group-label" id="l-disc">Disciplina</span>
-        <button class="chip" data-k="disc" data-v="aim" title="Ranked de puntería">Puntería</button>
-        <button class="chip" data-k="disc" data-v="cps" title="Ranked de clics por segundo">CPS</button>
-      </div>
-      <div class="group" id="g-size" role="group" aria-labelledby="l-size">
-        <span class="group-label" id="l-size">Tamaño</span>
-        <button class="chip" data-k="size" data-v="s">Pequeño</button>
-        <button class="chip" data-k="size" data-v="m">Medio</button>
-        <button class="chip" data-k="size" data-v="l">Grande</button>
-      </div>
-      <div class="group" id="g-dur" role="group" aria-labelledby="l-dur">
-        <span class="group-label" id="l-dur">Duración</span>
-        <button class="chip" data-k="dur" data-v="30">30 s</button>
-        <button class="chip" data-k="dur" data-v="60">60 s</button>
-      </div>
-      <div class="group" id="g-cdur" role="group" aria-labelledby="l-cdur" hidden>
-        <span class="group-label" id="l-cdur">Duración</span>
-        <button class="chip" data-k="cdur" data-v="5">5 s</button>
-        <button class="chip" data-k="cdur" data-v="10">10 s</button>
-        <button class="chip" data-k="cdur" data-v="30">30 s</button>
-      </div>
-      <div class="group" id="g-rounds" role="group" aria-labelledby="l-rounds" hidden>
-        <span class="group-label" id="l-rounds">Rondas</span>
-        <button class="chip" data-k="rounds" data-v="5">5</button>
-        <button class="chip" data-k="rounds" data-v="10">10</button>
+      <div class="opts">
+        <div class="group" id="g-disc" role="group" aria-labelledby="l-disc" hidden>
+          <span class="group-label" id="l-disc">Disciplina</span>
+          <span class="seg">
+            <button class="chip" data-k="disc" data-v="aim" title="Ranked de puntería">Puntería</button>
+            <button class="chip" data-k="disc" data-v="cps" title="Ranked de clics por segundo">CPS</button>
+          </span>
+        </div>
+        <div class="group" id="g-size" role="group" aria-labelledby="l-size">
+          <span class="group-label" id="l-size">Tamaño</span>
+          <span class="seg">
+            <button class="chip" data-k="size" data-v="s">Pequeño</button>
+            <button class="chip" data-k="size" data-v="m">Medio</button>
+            <button class="chip" data-k="size" data-v="l">Grande</button>
+          </span>
+        </div>
+        <div class="group" id="g-dur" role="group" aria-labelledby="l-dur">
+          <span class="group-label" id="l-dur">Duración</span>
+          <span class="seg">
+            <button class="chip" data-k="dur" data-v="30">30 s</button>
+            <button class="chip" data-k="dur" data-v="60">60 s</button>
+          </span>
+        </div>
+        <div class="group" id="g-cdur" role="group" aria-labelledby="l-cdur" hidden>
+          <span class="group-label" id="l-cdur">Duración</span>
+          <span class="seg">
+            <button class="chip" data-k="cdur" data-v="5">5 s</button>
+            <button class="chip" data-k="cdur" data-v="10">10 s</button>
+            <button class="chip" data-k="cdur" data-v="30">30 s</button>
+          </span>
+        </div>
+        <div class="group" id="g-rounds" role="group" aria-labelledby="l-rounds" hidden>
+          <span class="group-label" id="l-rounds">Rondas</span>
+          <span class="seg">
+            <button class="chip" data-k="rounds" data-v="5">5</button>
+            <button class="chip" data-k="rounds" data-v="10">10</button>
+          </span>
+        </div>
       </div>
     </div>
 
@@ -366,12 +482,15 @@ button{font-family:inherit}
       </div>
       <div class="group" role="group" aria-labelledby="l-range">
         <span class="group-label" id="l-range">Periodo</span>
-        <button class="chip" data-k="range" data-v="7">7 días</button>
-        <button class="chip" data-k="range" data-v="14">14 días</button>
-        <button class="chip" data-k="range" data-v="30">30 días</button>
+        <span class="seg">
+          <button class="chip" data-k="range" data-v="7">7 días</button>
+          <button class="chip" data-k="range" data-v="14">14 días</button>
+          <button class="chip" data-k="range" data-v="30">30 días</button>
+        </span>
       </div>
     </div>
 
+    <div class="chart-card">
     <div class="chart-summary">
       <div class="big" id="ch-big"></div>
       <p id="ch-caption"></p>
@@ -384,6 +503,7 @@ button{font-family:inherit}
         <p id="chart-empty-txt">No hay sesiones en este periodo.<br>Entrena una para ver tu evolución día a día.</p>
         <button class="btn primary" id="empty-go" type="button">Entrenar ahora</button>
       </div>
+    </div>
     </div>
     <div class="sr" id="chart-sr" aria-live="polite"></div>
   </section>
