@@ -299,6 +299,59 @@ body{background:radial-gradient(70% 420px at 50% 0,rgb(var(--pink-rgb) / .12),tr
   .facts>div{padding:10px 12px}
 }
 
+/* ---------- social: Google + Supabase (v3.0) ---------- */
+.auth-chip{display:flex;align-items:center;gap:8px;padding:6px 16px 6px 6px;cursor:pointer;background:rgb(var(--pink-rgb) / .04)}
+.auth-chip .g-icon{width:18px;height:18px;flex:none;background:#fff;border-radius:50%;padding:3px;box-sizing:border-box}
+.auth-chip .g-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;display:block}
+.auth-chip .g-avatar.ph{display:grid;place-items:center;background:var(--pink);color:#000;font:700 .85rem var(--display)}
+.auth-chip:has(.g-avatar){padding:4px}
+
+.card-note{max-width:60ch;margin:40px auto;padding:22px 24px;border:1px solid var(--line-soft);border-radius:16px;background:rgb(var(--pink-rgb) / .04);text-align:center}
+.card-note h2{margin:0 0 8px;font:600 1.2rem var(--display)}
+.card-note code{padding:1px 6px;border-radius:6px;background:rgb(var(--pink-rgb) / .14);font-size:.9em}
+
+.social-hero{max-width:52ch;margin:54px auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+.social-hero h2{margin:0;font:600 clamp(1.4rem,4vw,1.9rem) var(--display)}
+.social-login{display:inline-flex;align-items:center;gap:10px}
+.social-login .g-icon{width:18px;height:18px;background:#fff;border-radius:50%;padding:3px;box-sizing:border-box}
+
+.me-card{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:18px 22px;margin-bottom:18px;border:1px solid var(--line-soft);border-radius:18px;background:rgb(var(--pink-rgb) / .05)}
+.me-avatar{width:56px;height:56px;border-radius:50%;flex:none;overflow:hidden;display:grid;place-items:center;background:var(--pink);color:#000;font:700 1.3rem var(--display)}
+.me-avatar img{width:100%;height:100%;object-fit:cover}
+.me-info{flex:1;min-width:180px}
+.me-name-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.me-name-row input{font:600 1rem var(--body);color:var(--text);background:#000;border:1px solid var(--line);border-radius:10px;padding:7px 12px;min-width:0;width:180px}
+.me-stats{margin:7px 0 2px;font-size:.92rem}
+.me-record{margin:0;font-size:.82rem;color:var(--muted)}
+
+.social-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;align-items:start}
+.panel{padding:18px 20px;border:1px solid var(--line-soft);border-radius:18px;background:rgb(var(--pink-rgb) / .03)}
+.panel h3{margin:0 0 12px;font:600 1.02rem var(--display)}
+.search-row input{width:100%;font:500 .95rem var(--body);color:var(--text);background:#000;border:1px solid var(--line);border-radius:999px;padding:10px 16px;box-sizing:border-box}
+.mini-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.mini-list:empty{margin:0}
+.mini-h{margin:4px 0 2px;font-size:.78rem;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+
+.friend-row,.board-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line-soft);border-radius:12px;background:rgb(var(--pink-rgb) / .03)}
+.board-row.me{border-color:var(--pink);background:rgb(var(--pink-rgb) / .1)}
+.rk-num{width:22px;flex:none;text-align:center;font:700 .85rem var(--display);color:var(--muted)}
+.board-row.me .rk-num{color:var(--pink)}
+.b-avatar{width:30px;height:30px;border-radius:50%;flex:none;overflow:hidden;display:grid;place-items:center;background:rgb(var(--pink-rgb) / .22);color:var(--pink);font:700 .78rem var(--display)}
+.b-avatar img{width:100%;height:100%;object-fit:cover}
+.b-name{flex:1;min-width:0;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.b-rating{font:700 .9rem var(--display);color:var(--pink)}
+.b-rating.sm{font-size:.82rem;margin-right:2px}
+.btn.sm{padding:6px 14px;font-size:.82rem}
+.friend-row .muted.sm{font-size:.8rem;margin-right:2px}
+
+@media (max-width:760px){
+  .social-grid{grid-template-columns:1fr}
+}
+@media (max-width:420px){
+  .me-card{padding:16px}
+  .me-name-row input{width:140px}
+}
+
 /* ajustes de cabecera y móvil */
 .top .bar{padding-left:clamp(16px,4vw,32px);padding-right:clamp(16px,4vw,32px)}
 .modes{scroll-padding-inline:clamp(16px,4vw,32px)}
@@ -307,9 +360,10 @@ body{background:radial-gradient(70% 420px at 50% 0,rgb(var(--pink-rgb) / .12),tr
   .brandrow{display:contents}
   .brand{order:1}
   .settings-toggle{order:2;margin-left:auto}
-  .tabs{order:3;width:100%}
+  .auth-chip{order:3}
+  .tabs{order:4;width:100%}
   .tabs .tab{flex:1;text-align:center}
-  .profile{order:4}
+  .profile{order:5}
   .hud{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   .hud:has(#h-bot-wrap:not([hidden])){grid-template-columns:repeat(2,minmax(0,1fr))}
   .hud>div{padding:10px 12px}
@@ -330,11 +384,16 @@ body{background:radial-gradient(70% 420px at 50% 0,rgb(var(--pink-rgb) / .12),tr
         <button class="tab" role="tab" id="tab-train" data-view="train" aria-selected="true" aria-controls="view-train">Entrenar</button>
         <button class="tab" role="tab" id="tab-cal" data-view="cal" aria-selected="false" aria-controls="view-cal" tabindex="-1">Calendario</button>
         <button class="tab" role="tab" id="tab-charts" data-view="charts" aria-selected="false" aria-controls="view-charts" tabindex="-1">Gráficas</button>
+        <button class="tab" role="tab" id="tab-social" data-view="social" aria-selected="false" aria-controls="view-social" tabindex="-1">Social</button>
       </nav>
     </div>
     <div class="settings-toggle">
       <button class="icon-btn" id="open-settings" type="button" aria-label="Abrir personalización" aria-expanded="false" title="Personalización">⚙</button>
     </div>
+    <button class="chip auth-chip" id="auth-btn" type="button">
+      <svg class="g-icon" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.91c1.7-1.57 2.69-3.88 2.69-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.26c-.81.54-1.84.86-3.05.86-2.34 0-4.33-1.58-5.04-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.96 10.72A5.4 5.4 0 0 1 3.68 9c0-.6.1-1.18.28-1.72V4.95H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.95l3 2.33C4.67 5.16 6.66 3.58 9 3.58z"/></svg>
+      <span id="auth-label">Entrar con Google</span>
+    </button>
     <div class="profile" id="profile-chip">
       <span class="lvl" id="p-lvl">Nv. 1</span>
       <span class="who">
@@ -508,6 +567,44 @@ body{background:radial-gradient(70% 420px at 50% 0,rgb(var(--pink-rgb) / .12),tr
     <div class="sr" id="chart-sr" aria-live="polite"></div>
   </section>
 
+  <!-- SOCIAL -->
+  <section class="view" id="view-social" role="tabpanel" aria-labelledby="tab-social" hidden>
+    <div class="card-note" id="social-setup" hidden>
+      <h2>Falta conectar Supabase</h2>
+      <p>Añade la URL de tu proyecto y la clave anon pública en las constantes <code>SUPABASE_URL</code> y <code>SUPABASE_ANON_KEY</code>, cerca del principio del script, para activar el inicio de sesión, la clasificación y los amigos.</p>
+    </div>
+
+    <div id="social-signedout" hidden>
+      <div class="social-hero">
+        <h2>Entrena con amigos</h2>
+        <p class="muted">Inicia sesión con Google para guardar tu progreso en la nube, aparecer en la clasificación global y añadir amigos.</p>
+        <button class="btn primary social-login" id="social-login-btn" type="button">
+          <svg class="g-icon" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.91c1.7-1.57 2.69-3.88 2.69-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.26c-.81.54-1.84.86-3.05.86-2.34 0-4.33-1.58-5.04-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.96 10.72A5.4 5.4 0 0 1 3.68 9c0-.6.1-1.18.28-1.72V4.95H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.95l3 2.33C4.67 5.16 6.66 3.58 9 3.58z"/></svg>
+          Entrar con Google
+        </button>
+      </div>
+    </div>
+
+    <div id="social-signedin" hidden>
+      <div class="me-card" id="me-card"></div>
+      <div class="social-grid">
+        <div class="panel" id="friends-panel">
+          <h3>Amigos</h3>
+          <div class="search-row">
+            <input id="friend-search" type="text" placeholder="Buscar por nombre de usuario…" autocomplete="off">
+          </div>
+          <div id="friend-search-results" class="mini-list"></div>
+          <div id="friend-requests" class="mini-list"></div>
+          <div id="friend-list" class="mini-list"></div>
+        </div>
+        <div class="panel" id="leaderboard-panel">
+          <h3>Clasificación global</h3>
+          <div id="leaderboard-list" class="board"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <footer class="foot">
@@ -524,6 +621,7 @@ body{background:radial-gradient(70% 420px at 50% 0,rgb(var(--pink-rgb) / .12),tr
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (() => {
 'use strict';
@@ -1211,6 +1309,7 @@ function finish(){
     save(KEY_S, sessions);
     syncProfileFromSessions();
     levelAfter = levelFromXp(profile.xp).level;
+    cloudPushSession(s);
   }
 
   settings.removeAttribute('inert');
@@ -1859,7 +1958,7 @@ document.addEventListener('click', e => {
 function setView(v){
   if (v !== 'train') cancelGame();
   view = v;
-  ['train', 'cal', 'charts'].forEach(n => {
+  ['train', 'cal', 'charts', 'social'].forEach(n => {
     $('#view-' + n).hidden = n !== v;
     const t = $('#tab-' + n);
     t.setAttribute('aria-selected', String(n === v));
@@ -1868,6 +1967,7 @@ function setView(v){
   if (v === 'train'){ resize(); renderToday(); updateIdleText(); }
   if (v === 'cal'){ renderCalendar(); renderDetail(); }
   if (v === 'charts'){ activeIdx = null; renderCharts(); }
+  if (v === 'social'){ renderSocial(); }
   window.scrollTo(0, 0);
 }
 const tabs = $$('.tab');
@@ -2115,6 +2215,283 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!settingsPanel.hidd
    ========================================================= */
 applyAppearance();
 syncChips();
+/* =========================================================
+   Social: cuenta de Google y datos en Supabase
+   ========================================================= */
+// Pega aquí la URL y la clave "anon" públicas de tu proyecto de Supabase
+// (Project Settings → API). La clave anon está pensada para usarse en el
+// navegador: lo que protege los datos son las políticas RLS, no el secreto.
+const SUPABASE_URL = 'https://lvuhgqlqmphohbvonsbb.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_-fsqOXhO69SQb6yGZraKdg_JrwGv2Oz';
+
+const sb = (window.supabase && !SUPABASE_URL.includes('TU-PROYECTO') && !SUPABASE_ANON_KEY.includes('TU-CLAVE'))
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
+const GOOGLE_ICON = `<svg class="g-icon" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.91c1.7-1.57 2.69-3.88 2.69-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.26c-.81.54-1.84.86-3.05.86-2.34 0-4.33-1.58-5.04-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.96 10.72A5.4 5.4 0 0 1 3.68 9c0-.6.1-1.18.28-1.72V4.95H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.95l3 2.33C4.67 5.16 6.66 3.58 9 3.58z"/></svg>`;
+
+let authUser = null;     // sesión de Supabase Auth, o null
+let socialBusy = false;  // evita sincronizar dos veces a la vez
+let friendRows = [];     // caché de mis relaciones de amistad
+
+const authBtn = $('#auth-btn');
+
+function signInGoogle(){
+  if (!sb) { setView('social'); return; }
+  sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.href.split('#')[0] } });
+}
+function signOut(){ if (sb) sb.auth.signOut(); }
+
+authBtn.addEventListener('click', () => { authUser ? setView('social') : signInGoogle(); });
+
+function updateAuthChip(){
+  if (authUser){
+    const name = authUser.user_metadata?.full_name || authUser.email || 'Tú';
+    const av = authUser.user_metadata?.avatar_url;
+    authBtn.innerHTML = av
+      ? `<img class="g-avatar" src="${av}" alt="" referrerpolicy="no-referrer">`
+      : `<span class="g-avatar ph">${(name[0] || '?').toUpperCase()}</span>`;
+    authBtn.title = name;
+  } else {
+    authBtn.title = '';
+    authBtn.innerHTML = `${GOOGLE_ICON}<span id="auth-label">Entrar con Google</span>`;
+  }
+}
+
+function suggestUsername(){
+  const base = (authUser.user_metadata?.full_name || authUser.email || 'jugador')
+    .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '').slice(0, 16) || 'jugador';
+  return base + Math.floor(Math.random() * 900 + 100);
+}
+
+/* Al iniciar sesión: las sesiones guardadas son la fuente de verdad.
+   Se funden las locales con las de la nube y se recalcula el perfil
+   a partir del historial completo, para no perder progreso de ningún lado. */
+async function cloudPullAndMerge(){
+  if (!sb || !authUser || socialBusy) return;
+  socialBusy = true;
+  try {
+    const { data: cloudRows } = await sb.from('sessions').select('t,data').eq('user_id', authUser.id);
+    const localT = new Set(sessions.map(s => s.t));
+    const cloudT = new Set();
+    (cloudRows || []).forEach(r => {
+      cloudT.add(r.t);
+      if (!localT.has(r.t) && r.data) sessions.push(r.data);
+    });
+    sessions.sort((a, b) => a.t - b.t);
+    save(KEY_S, sessions);
+    syncProfileFromSessions();
+
+    const missing = sessions.filter(s => !cloudT.has(s.t)).map(s => ({ user_id: authUser.id, t: s.t, data: s }));
+    if (missing.length) await sb.from('sessions').upsert(missing, { onConflict: 'user_id,t' });
+
+    const { data: existing } = await sb.from('profiles').select('username').eq('id', authUser.id).maybeSingle();
+    profile.username = existing?.username || suggestUsername();
+    await pushProfile();
+  } catch (e) { console.error('Sincronización con Supabase', e); }
+  socialBusy = false;
+  renderProfile();
+  if (view === 'social') renderSocial();
+}
+
+function pushProfile(){
+  if (!sb || !authUser) return Promise.resolve();
+  return sb.from('profiles').upsert({
+    id: authUser.id,
+    username: profile.username || suggestUsername(),
+    avatar_url: authUser.user_metadata?.avatar_url || null,
+    rating: profile.rating, xp: profile.xp, level: levelFromXp(profile.xp).level,
+    wins: profile.wins, losses: profile.losses, draws: profile.draws,
+    updated_at: new Date().toISOString()
+  });
+}
+function cloudPushSession(s){
+  if (!sb || !authUser) return;
+  sb.from('sessions').upsert([{ user_id: authUser.id, t: s.t, data: s }], { onConflict: 'user_id,t' })
+    .then(() => pushProfile())
+    .catch(e => console.error('No se pudo guardar en la nube', e));
+}
+
+async function initAuth(){
+  if (!sb){ updateAuthChip(); return; }
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    authUser = session?.user || null;
+  } catch (e) { console.error(e); }
+  updateAuthChip();
+  if (view === 'social') renderSocial();
+  if (authUser) cloudPullAndMerge();
+
+  sb.auth.onAuthStateChange((event, session) => {
+    authUser = session?.user || null;
+    updateAuthChip();
+    if (view === 'social') renderSocial();
+    if (authUser && event === 'SIGNED_IN') cloudPullAndMerge();
+  });
+}
+
+function renderSocial(){
+  $('#social-setup').hidden = !!sb;
+  $('#social-signedout').hidden = !sb || !!authUser;
+  $('#social-signedin').hidden = !sb || !authUser;
+  if (!sb || !authUser) return;
+  renderMeCard();
+  renderLeaderboard();
+  renderFriends();
+}
+$('#social-login-btn').addEventListener('click', signInGoogle);
+
+function renderMeCard(){
+  const tier = tierFor(profile.rating);
+  const { level } = levelFromXp(profile.xp);
+  const av = authUser.user_metadata?.avatar_url;
+  $('#me-card').innerHTML = `
+    <div class="me-avatar">${av ? `<img src="${av}" alt="" referrerpolicy="no-referrer">` : (profile.username || '?')[0].toUpperCase()}</div>
+    <div class="me-info">
+      <div class="me-name-row">
+        <input id="me-username" type="text" value="${profile.username || ''}" maxlength="20" aria-label="Tu nombre de usuario">
+        <button class="btn sm" id="me-username-save" type="button">Guardar</button>
+      </div>
+      <p class="me-stats">Nv.\u00a0${level} · <span class="rank-icon ${tierClass(tier.name)}">${tierIcon(tier.name)}</span>${tier.name} · ${nf(profile.rating)}\u00a0puntos</p>
+      <p class="me-record">${profile.wins}\u00a0V · ${profile.losses}\u00a0D · ${profile.draws}\u00a0E</p>
+    </div>
+    <button class="btn sm" id="social-logout" type="button">Cerrar sesión</button>`;
+  $('#me-username-save').addEventListener('click', saveUsername);
+  $('#social-logout').addEventListener('click', signOut);
+}
+
+async function saveUsername(){
+  const input = $('#me-username');
+  const v = input.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20);
+  if (!v){ input.value = profile.username || ''; return; }
+  const btn = $('#me-username-save'); btn.disabled = true; btn.textContent = 'Guardando…';
+  const { error } = await sb.from('profiles').update({ username: v }).eq('id', authUser.id);
+  btn.disabled = false;
+  if (error){ btn.textContent = 'Nombre en uso'; setTimeout(() => btn.textContent = 'Guardar', 1700); return; }
+  profile.username = v; input.value = v;
+  btn.textContent = 'Guardado'; setTimeout(() => btn.textContent = 'Guardar', 1200);
+  renderLeaderboard(); renderFriends();
+}
+
+function boardRow(rank, p, removable){
+  const tier = tierFor(p.rating || 1000);
+  const me = p.id === authUser.id;
+  return `<div class="board-row${me ? ' me' : ''}">
+    <span class="rk-num">${rank}</span>
+    <span class="b-avatar">${p.avatar_url ? `<img src="${p.avatar_url}" alt="" referrerpolicy="no-referrer">` : (p.username || '?')[0].toUpperCase()}</span>
+    <span class="b-name">${p.username || 'jugador'}</span>
+    <span class="rank-icon ${tierClass(tier.name)}">${tierIcon(tier.name)}</span>
+    <span class="b-rating">${nf(p.rating || 1000)}</span>
+    ${removable ? `<button class="btn sm" data-act="remove" data-id="${p.id}" title="Quitar amigo">✕</button>` : ''}
+  </div>`;
+}
+
+async function renderLeaderboard(){
+  const el = $('#leaderboard-list'); el.innerHTML = '<p class="muted">Cargando…</p>';
+  const { data, error } = await sb.from('profiles').select('id,username,avatar_url,rating').order('rating', { ascending: false }).limit(50);
+  if (error){ el.innerHTML = '<p class="muted">No se pudo cargar la clasificación.</p>'; return; }
+  el.innerHTML = (data || []).map((p, i) => boardRow(i + 1, p, false)).join('') || '<p class="muted">Aún no hay nadie en la clasificación.</p>';
+}
+
+async function fetchProfilesByIds(ids){
+  const uniq = [...new Set(ids)];
+  if (!uniq.length) return new Map();
+  const { data } = await sb.from('profiles').select('id,username,avatar_url,rating').in('id', uniq);
+  return new Map((data || []).map(p => [p.id, p]));
+}
+function relationWith(id){
+  const r = friendRows.find(x => (x.user_id === authUser.id && x.friend_id === id) || (x.friend_id === authUser.id && x.user_id === id));
+  return r ? { ...r, mine: r.user_id === authUser.id } : null;
+}
+
+async function loadFriendRows(){
+  const { data } = await sb.from('friends').select('user_id,friend_id,status')
+    .or(`user_id.eq.${authUser.id},friend_id.eq.${authUser.id}`);
+  friendRows = data || [];
+}
+async function renderFriends(){
+  await loadFriendRows();
+  renderFriendRequests();
+  renderFriendList();
+}
+
+function reqRow(p, kind){
+  if (!p) return '';
+  return `<div class="friend-row">
+    <span class="b-avatar">${p.avatar_url ? `<img src="${p.avatar_url}" alt="" referrerpolicy="no-referrer">` : (p.username || '?')[0].toUpperCase()}</span>
+    <span class="b-name">${p.username}</span>
+    ${kind === 'incoming'
+      ? `<button class="btn sm primary" data-act="accept" data-id="${p.id}">Aceptar</button><button class="btn sm" data-act="decline" data-id="${p.id}">Rechazar</button>`
+      : `<span class="muted sm">Pendiente</span><button class="btn sm" data-act="cancel" data-id="${p.id}">Cancelar</button>`}
+  </div>`;
+}
+async function renderFriendRequests(){
+  const incoming = friendRows.filter(r => r.status === 'pending' && r.friend_id === authUser.id);
+  const outgoing = friendRows.filter(r => r.status === 'pending' && r.user_id === authUser.id);
+  const el = $('#friend-requests');
+  if (!incoming.length && !outgoing.length){ el.innerHTML = ''; return; }
+  const map = await fetchProfilesByIds([...incoming.map(r => r.user_id), ...outgoing.map(r => r.friend_id)]);
+  el.innerHTML =
+    (incoming.length ? `<p class="mini-h">Te han pedido amistad</p>` : '') +
+    incoming.map(r => reqRow(map.get(r.user_id), 'incoming')).join('') +
+    (outgoing.length ? `<p class="mini-h">Solicitudes enviadas</p>` : '') +
+    outgoing.map(r => reqRow(map.get(r.friend_id), 'outgoing')).join('');
+}
+async function renderFriendList(){
+  const accepted = friendRows.filter(r => r.status === 'accepted');
+  const el = $('#friend-list');
+  if (!accepted.length){ el.innerHTML = '<p class="muted">Aún no tienes amigos añadidos. Búscalos arriba por su nombre de usuario.</p>'; return; }
+  const ids = accepted.map(r => r.user_id === authUser.id ? r.friend_id : r.user_id);
+  const map = await fetchProfilesByIds(ids);
+  const list = [...map.values(), { id: authUser.id, username: `${profile.username || 'Tú'} (tú)`, avatar_url: authUser.user_metadata?.avatar_url, rating: profile.rating }]
+    .sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  el.innerHTML = `<p class="mini-h">Clasificación entre amigos</p>` + list.map((p, i) => boardRow(i + 1, p, p.id !== authUser.id)).join('');
+}
+
+let searchTimer = 0;
+$('#friend-search').addEventListener('input', e => {
+  clearTimeout(searchTimer);
+  const q = e.target.value.trim();
+  searchTimer = setTimeout(() => renderFriendSearch(q), 300);
+});
+async function renderFriendSearch(q){
+  const el = $('#friend-search-results');
+  if (!q || q.length < 2){ el.innerHTML = ''; return; }
+  const { data } = await sb.from('profiles').select('id,username,avatar_url,rating').ilike('username', `%${q}%`).neq('id', authUser.id).limit(8);
+  el.innerHTML = (data || []).map(p => {
+    const rel = relationWith(p.id);
+    const action = !rel
+      ? `<button class="btn sm primary" data-act="add" data-id="${p.id}">Añadir</button>`
+      : rel.status === 'accepted' ? `<span class="muted sm">Ya sois amigos</span>`
+      : rel.mine ? `<span class="muted sm">Pendiente</span>`
+      : `<button class="btn sm primary" data-act="accept" data-id="${p.id}">Aceptar</button>`;
+    return `<div class="friend-row">
+      <span class="b-avatar">${p.avatar_url ? `<img src="${p.avatar_url}" alt="" referrerpolicy="no-referrer">` : (p.username || '?')[0].toUpperCase()}</span>
+      <span class="b-name">${p.username}</span><span class="b-rating sm">${nf(p.rating || 1000)}</span>
+      ${action}
+    </div>`;
+  }).join('') || '<p class="muted">Nadie con ese nombre.</p>';
+}
+
+document.addEventListener('click', async e => {
+  const btn = e.target.closest('[data-act]');
+  if (!btn || !sb || !authUser || !$('#view-social') || $('#view-social').hidden) return;
+  const id = btn.dataset.id, act = btn.dataset.act;
+  btn.disabled = true;
+  try {
+    if (act === 'add') await sb.from('friends').insert({ user_id: authUser.id, friend_id: id, status: 'pending' });
+    else if (act === 'accept') await sb.from('friends').update({ status: 'accepted' }).eq('user_id', id).eq('friend_id', authUser.id);
+    else if (act === 'decline') await sb.from('friends').delete().eq('user_id', id).eq('friend_id', authUser.id);
+    else if (act === 'cancel') await sb.from('friends').delete().eq('user_id', authUser.id).eq('friend_id', id);
+    else if (act === 'remove') await sb.from('friends')
+      .or(`and(user_id.eq.${authUser.id},friend_id.eq.${id}),and(user_id.eq.${id},friend_id.eq.${authUser.id})`).delete();
+  } catch (err) { console.error(err); }
+  await renderFriends();
+  renderFriendSearch($('#friend-search').value.trim());
+});
+
+initAuth();
+
 updateIdleText();
 updateHud(performance.now());
 renderProfile();
