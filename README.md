@@ -68,6 +68,7 @@ Consulta [docs/STRUCTURE.md](docs/STRUCTURE.md) para una explicación más detal
 ## Ejecución
 
 No se necesita un proceso de compilación. Abre `index.html` en un navegador o publícalo mediante cualquier servicio de hosting estático.
+También puedes consultar la versión web: https://skr-47.github.io/mira-app/
 
 ## Licencia
 
